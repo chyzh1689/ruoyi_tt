@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('商户信息列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+<!--                            <li>-->
+<!--                                <label>父级Id：</label>-->
+<!--                                <input type="text" name="parentId"/>-->
+<!--                            </li>-->
+                            <li>
+                                <label>名称：</label>
+                                <input type="text" name="mechName" maxlength="20"/>
+                            </li>
+                            <li>
+                                <label>编号：</label>
+                                <input type="text" name="mechNo" maxlength="20"/>
+                            </li>
+                            <li>
+                                <label>类型：</label>
+                                <select name="mechType" th:with="type=${@dict.getType('tt_mech_type')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                            </select>
+                            </li>
+                            <li>
+                                状态：<select name="mechStatus" th:with="type=${@dict.getType('sys_normal_disable')}">
+                                <option value="">所有</option>
+                                <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                            </select>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add(0)" shiro:hasPermission="tt:mechant:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="tt:mechant:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="tt:mechant:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="tt:mechant:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('tt:mechant:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('tt:mechant:remove')}]];
+        var addSubFlag = [[${@permission.hasPermi('tt:mechant:addSub')}]];
+        var prefix = ctx + "tt/mechant";
+        var mechTypes = [[${@dict.getType('tt_mech_type')}]];
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add/{id}",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "商户信息",
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'parMechName',
+                    title: '所属商户'
+                },
+                {
+                    field: 'mechType',
+                    title: '类型',
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(mechTypes, row.mechType);
+                    }
+                },
+                {
+                    field: 'mechName',
+                    title: '名称'
+                },
+                {
+                    field: 'mechNo',
+                    title: '编号'
+                },
+                {
+                    field: 'mechPhone',
+                    title: '手机号'
+                },
+                {
+                    visible: editFlag == 'hidden' ? false : true,
+                    field: 'mechStatus',
+                    title: '状态',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return statusTools(row);
+                    }
+                },
+                {
+                    field: 'createTime',
+                    title: '创建时间',
+                    sortable: true
+                },
+                {
+                    field: 'mechMemo',
+                    title: '备注信息'
+                },
+
+
+                {
+                    field: 'mechMemo1',
+                    title: '备注1',
+                    visible: false
+                },
+                {
+                    field: 'mechMemo2',
+                    title: '备注2',
+                    visible: false
+                },
+                {
+                    field: 'mechMemo3',
+                    title: '备注3',
+                    visible: false
+                },
+                {
+                    field: 'mechMemo4',
+                    title: '备注4',
+                    visible: false
+                },
+                {
+                    field: 'mechMemo5',
+                    title: '备注5',
+                    visible: false
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.mechId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        if(row.parentId==0){
+                            actions.push('<a class="btn btn-info btn-xs ' + addSubFlag + '" href="javascript:void(0)" onclick="$.operate.add(\'' + row.mechId + '\')"><i class="fa fa-plus"></i>新增员工</a> ');
+                        }
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.mechId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            $.table.init(options);
+        });
+        /* 商户状态显示 */
+        function statusTools(row) {
+            if (row.mechStatus == 1) {
+                return '<i class=\"fa fa-toggle-off text-info fa-2x\" onclick="enable(\'' + row.mechId + '\')" title="已禁用"></i>';
+            } else {
+                return '<i class=\"fa fa-toggle-on text-info fa-2x\" onclick="disable(\'' + row.mechId + '\')" title="已启用"></i>';
+            }
+        }
+
+        /* 状态-停用 */
+        function disable(mechId) {
+            $.modal.confirm("确认要禁用该设备吗？", function() {
+                $.operate.post(prefix + "/changeStatus", { "mechId": mechId, "mechStatus": 1 });
+            })
+        }
+
+        /* 状态启用 */
+        function enable(mechId) {
+            $.modal.confirm("确认要启用该设备吗？", function() {
+                $.operate.post(prefix + "/changeStatus", { "mechId": mechId, "mechStatus": 0 });
+            })
+        }
+    </script>
+</body>
+</html>

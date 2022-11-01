@@ -29,8 +29,8 @@ import com.ruoyi.common.utils.file.FileUtils;
  */
 @Controller
 @RequestMapping("/common")
-public class CommonController
-{
+public class CommonController{
+
     private static final Logger log = LoggerFactory.getLogger(CommonController.class);
 
     @Autowired

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改商户信息')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-mechant-edit" th:object="${mechant}">
+            <input name="mechId" th:field="*{mechId}" type="hidden">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">所属商户：</label>
+                <div class="col-sm-4">
+                    <input class="form-control" th:value="${mechant.parMechName}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">编号：</label>
+                <div class="col-sm-4">
+                    <input name="mechNo" th:field="*{mechNo}" class="form-control" type="text" readonly>
+                </div>
+                <label class="col-sm-2 control-label">名称：</label>
+                <div class="col-sm-4">
+                    <input name="mechName" th:field="*{mechName}" class="form-control" type="text" maxlength="20">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-2 control-label">手机：</label>
+                <div class="col-sm-4">
+                    <input name="mechPhone" th:field="*{mechPhone}" class="form-control" type="text" maxlength="11">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">备注信息：</label>
+                <div class="col-sm-10">
+                    <input name="mechMemo" th:field="*{mechMemo}" class="form-control" type="text" maxlength="80">
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "tt/mechant";
+        $("#form-mechant-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-mechant-edit').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

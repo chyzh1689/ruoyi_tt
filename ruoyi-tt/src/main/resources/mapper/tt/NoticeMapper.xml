@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.tt.mapper.NoticeMapper">
+    
+    <resultMap type="Notice" id="NoticeResult">
+        <result property="accountId"    column="account_id"    />
+        <result property="noticeId"    column="notice_id"    />
+        <result property="noticeNo"    column="notice_no"    />
+        <result property="noticeName"    column="notice_name"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectNoticeVo">
+        select account_id, notice_id, notice_no, notice_name, create_time from tt_notice
+    </sql>
+
+    <select id="selectNoticeList" parameterType="Notice" resultMap="NoticeResult">
+        <include refid="selectNoticeVo"/>
+        <where>  
+            <if test="noticeNo != null  and noticeNo != ''"> and notice_no = #{noticeNo}</if>
+            <if test="noticeName != null  and noticeName != ''"> and notice_name like concat('%', #{noticeName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectNoticeByAccountId" parameterType="Long" resultMap="NoticeResult">
+        <include refid="selectNoticeVo"/>
+        where account_id = #{accountId}
+    </select>
+        
+    <insert id="insertNotice" parameterType="Notice">
+        insert into tt_notice
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="accountId != null">account_id,</if>
+            <if test="noticeId != null">notice_id,</if>
+            <if test="noticeNo != null and noticeNo != ''">notice_no,</if>
+            <if test="noticeName != null">notice_name,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="accountId != null">#{accountId},</if>
+            <if test="noticeId != null">#{noticeId},</if>
+            <if test="noticeNo != null and noticeNo != ''">#{noticeNo},</if>
+            <if test="noticeName != null">#{noticeName},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateNotice" parameterType="Notice">
+        update tt_notice
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="noticeId != null">notice_id = #{noticeId},</if>
+            <if test="noticeNo != null and noticeNo != ''">notice_no = #{noticeNo},</if>
+            <if test="noticeName != null">notice_name = #{noticeName},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where account_id = #{accountId}
+    </update>
+
+    <delete id="deleteNoticeByAccountId" parameterType="Long">
+        delete from tt_notice where account_id = #{accountId}
+    </delete>
+
+    <delete id="deleteNoticeByAccountIds" parameterType="String">
+        delete from tt_notice where account_id in 
+        <foreach item="accountId" collection="array" open="(" separator="," close=")">
+            #{accountId}
+        </foreach>
+    </delete>
+
+</mapper>

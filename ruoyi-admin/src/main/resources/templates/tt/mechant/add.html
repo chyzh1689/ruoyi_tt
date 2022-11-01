@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('新增商户信息')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-mechant-add">
+            <input name="parentId" class="form-control" type="hidden" th:value="${mechant.parentId}" >
+            <div class="form-group">
+                <label class="col-sm-2 control-label">所属商户：</label>
+                <div class="col-sm-4">
+                    <input class="form-control" th:value="${mechant.parMechName}" readonly>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">编号：</label>
+                <div class="col-sm-4">
+                    <input name="mechNo" class="form-control" type="text" maxlength="20">
+                </div>
+                <label class="col-sm-2 control-label">名称：</label>
+                <div class="col-sm-4">
+                    <input name="mechName" class="form-control" type="text" maxlength="20">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-2 control-label">手机：</label>
+                <div class="col-sm-4">
+                    <input name="mechPhone" class="form-control" type="number" maxlength="11">
+                </div>
+            </div>
+            <div class="form-group">    
+                <label class="col-sm-2 control-label">备注信息：</label>
+                <div class="col-sm-10">
+                    <input name="mechMemo" class="form-control" type="text" maxlength="80">
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "tt/mechant"
+        $("#form-mechant-add").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/add", $('#form-mechant-add').serialize());
+            }
+        }
+    </script>
+</body>
+</html>

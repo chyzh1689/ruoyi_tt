@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.tt.mapper.AccountMapper">
+    
+    <resultMap type="Account" id="AccountResult">
+        <result property="accountId"    column="account_id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="accountNo"    column="account_no"    />
+        <result property="accountName"    column="account_name"    />
+        <result property="accountType"    column="account_type"    />
+        <result property="accountStatus"    column="account_status"    />
+        <result property="accountMemo1"    column="account_memo1"    />
+        <result property="accountMemo2"    column="account_memo2"    />
+        <result property="accountMemo3"    column="account_memo3"    />
+        <result property="accountMemo4"    column="account_memo4"    />
+        <result property="accountMemo5"    column="account_memo5"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectAccountVo">
+        select account_id, device_id, account_no, account_name, account_type, account_status, account_memo1, account_memo2, account_memo3, account_memo4, account_memo5, create_by, create_time, update_by, update_time from tt_account
+    </sql>
+
+    <select id="selectAccountList" parameterType="Account" resultMap="AccountResult">
+        <include refid="selectAccountVo"/>
+        <where>  
+            <if test="deviceId != null "> and device_id = #{deviceId}</if>
+            <if test="accountNo != null  and accountNo != ''"> and account_no = #{accountNo}</if>
+            <if test="accountName != null  and accountName != ''"> and account_name like concat('%', #{accountName}, '%')</if>
+            <if test="accountType != null  and accountType != ''"> and account_type = #{accountType}</if>
+            <if test="accountStatus != null  and accountStatus != ''"> and account_status = #{accountStatus}</if>
+            <if test="accountMemo1 != null  and accountMemo1 != ''"> and account_memo1 = #{accountMemo1}</if>
+            <if test="accountMemo2 != null  and accountMemo2 != ''"> and account_memo2 = #{accountMemo2}</if>
+            <if test="accountMemo3 != null  and accountMemo3 != ''"> and account_memo3 = #{accountMemo3}</if>
+            <if test="accountMemo4 != null  and accountMemo4 != ''"> and account_memo4 = #{accountMemo4}</if>
+            <if test="accountMemo5 != null  and accountMemo5 != ''"> and account_memo5 = #{accountMemo5}</if>
+        </where>
+    </select>
+    
+    <select id="selectAccountByAccountId" parameterType="Long" resultMap="AccountResult">
+        <include refid="selectAccountVo"/>
+        where account_id = #{accountId}
+    </select>
+        
+    <insert id="insertAccount" parameterType="Account">
+        insert into tt_account
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="accountId != null">account_id,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="accountNo != null">account_no,</if>
+            <if test="accountName != null">account_name,</if>
+            <if test="accountType != null">account_type,</if>
+            <if test="accountStatus != null">account_status,</if>
+            <if test="accountMemo1 != null">account_memo1,</if>
+            <if test="accountMemo2 != null">account_memo2,</if>
+            <if test="accountMemo3 != null">account_memo3,</if>
+            <if test="accountMemo4 != null">account_memo4,</if>
+            <if test="accountMemo5 != null">account_memo5,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="accountId != null">#{accountId},</if>
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="accountNo != null">#{accountNo},</if>
+            <if test="accountName != null">#{accountName},</if>
+            <if test="accountType != null">#{accountType},</if>
+            <if test="accountStatus != null">#{accountStatus},</if>
+            <if test="accountMemo1 != null">#{accountMemo1},</if>
+            <if test="accountMemo2 != null">#{accountMemo2},</if>
+            <if test="accountMemo3 != null">#{accountMemo3},</if>
+            <if test="accountMemo4 != null">#{accountMemo4},</if>
+            <if test="accountMemo5 != null">#{accountMemo5},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateAccount" parameterType="Account">
+        update tt_account
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceId != null">device_id = #{deviceId},</if>
+            <if test="accountNo != null">account_no = #{accountNo},</if>
+            <if test="accountName != null">account_name = #{accountName},</if>
+            <if test="accountType != null">account_type = #{accountType},</if>
+            <if test="accountStatus != null">account_status = #{accountStatus},</if>
+            <if test="accountMemo1 != null">account_memo1 = #{accountMemo1},</if>
+            <if test="accountMemo2 != null">account_memo2 = #{accountMemo2},</if>
+            <if test="accountMemo3 != null">account_memo3 = #{accountMemo3},</if>
+            <if test="accountMemo4 != null">account_memo4 = #{accountMemo4},</if>
+            <if test="accountMemo5 != null">account_memo5 = #{accountMemo5},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where account_id = #{accountId}
+    </update>
+
+    <delete id="deleteAccountByAccountId" parameterType="Long">
+        delete from tt_account where account_id = #{accountId}
+    </delete>
+
+    <delete id="deleteAccountByAccountIds" parameterType="String">
+        delete from tt_account where account_id in 
+        <foreach item="accountId" collection="array" open="(" separator="," close=")">
+            #{accountId}
+        </foreach>
+    </delete>
+
+</mapper>

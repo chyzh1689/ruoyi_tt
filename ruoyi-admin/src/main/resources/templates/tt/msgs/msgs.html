@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('通讯记录信息列表')" />
+</head>
+<body class="gray-bg">
+     <div class="container-div">
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "tt/msgs";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                modalName: "通讯记录信息",
+                columns: [
+                {
+                    field: 'value',
+                    title: '消息记录',
+                    formatter: function (value, row, index) {
+                        return row;
+                    }
+                },
+                ]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

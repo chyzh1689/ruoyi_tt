@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改设备信息')" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-device-edit" th:object="${device}">
+            <input name="deviceId" th:field="*{deviceId}" type="hidden">
+            <input name="mechOwn" type="hidden" id="mechOwn"/>
+            <div class="form-group">    
+                <label class="col-sm-2 control-label">所属者：</label>
+                <div class="col-sm-4">
+                    <div class="input-group">
+                        <input name="mechOwnName" onclick="selectMechTree()" id="treeName" type="text"
+                               placeholder="请选择所属者" class="form-control" th:field="*{mechOwnName}" required>
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">设备名称：</label>
+                <div class="col-sm-4">
+                    <input name="deviveName" th:field="*{deviveName}" class="form-control" type="text">
+                </div>
+                <label class="col-sm-2 control-label">设备编码：</label>
+                <div class="col-sm-4">
+                    <input name="deviceNo" th:field="*{deviceNo}" class="form-control" type="text">
+                </div>
+            </div>
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <script th:inline="javascript">
+        var prefix = ctx + "tt/device";
+        $("#form-device-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-device-edit').serialize());
+            }
+        }
+        /* 用户管理-新增-选择商户树 */
+        function selectMechTree () {
+            var mechOwn = $("#mechOwn").val();
+            mechOwn = $.common.isEmpty(mechOwn) ? "0" : mechOwn;
+            var url = ctx + "tt/device/selectMechTree/" + mechOwn;
+            var options = {
+                title: '选择所属者',
+                width: "380",
+                url: url,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+        function doSubmit(index, layero){
+            var body = $.modal.getChildFrame(index);
+            $("#mechOwn").val(body.find('#treeId').val());
+            $("#treeName").val(body.find('#treeName').val());
+            $.modal.close(index);
+        }
+    </script>
+</body>
+</html>

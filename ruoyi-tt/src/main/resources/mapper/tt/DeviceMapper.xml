@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.tt.mapper.DeviceMapper">
+    
+    <resultMap type="Device" id="DeviceResult">
+        <result property="deviceId"    column="device_id"    />
+        <result property="mechId"    column="mech_id"    />
+        <result property="mechName"    column="mech_name"    />
+        <result property="mechOwn"    column="mech_own"    />
+        <result property="mechOwnName"    column="mech_own_name"    />
+        <result property="deviveName"    column="devive_name"    />
+        <result property="deviceNo"    column="device_no"    />
+        <result property="deviceStatus"    column="device_status"    />
+        <result property="deviceMemo1"    column="device_memo1"    />
+        <result property="deviceMemo2"    column="device_memo2"    />
+        <result property="deviceMemo3"    column="device_memo3"    />
+        <result property="deviceMemo4"    column="device_memo4"    />
+        <result property="deviceMemo5"    column="device_memo5"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectDeviceVo">
+        select device_id, mech_id, mech_own,
+            (select mech.mech_name from tt_mechant  mech where mech.mech_id = dev.mech_id) mech_name,
+            (select mech.mech_name from tt_mechant  mech where mech.mech_id = dev.mech_own) mech_own_name,
+            devive_name, device_no, device_status, device_memo1, device_memo2, device_memo3, device_memo4, device_memo5, create_by, create_time, update_by, update_time from tt_device dev
+    </sql>
+
+    <select id="selectDeviceList" parameterType="Device" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        <where>  
+            <if test="mechId != null "> and mech_id = #{mechId}</if>
+            <if test="mechOwn != null "> and mech_own = #{mechOwn}</if>
+            <if test="deviveName != null  and deviveName != ''"> and devive_name like concat('%', #{deviveName}, '%')</if>
+            <if test="deviceNo != null  and deviceNo != ''"> and device_no = #{deviceNo}</if>
+            <if test="deviceStatus != null  and deviceStatus != ''"> and device_status = #{deviceStatus}</if>
+            <if test="deviceMemo1 != null  and deviceMemo1 != ''"> and device_memo1 = #{deviceMemo1}</if>
+            <if test="deviceMemo2 != null  and deviceMemo2 != ''"> and device_memo2 = #{deviceMemo2}</if>
+            <if test="deviceMemo3 != null  and deviceMemo3 != ''"> and device_memo3 = #{deviceMemo3}</if>
+            <if test="deviceMemo4 != null  and deviceMemo4 != ''"> and device_memo4 = #{deviceMemo4}</if>
+            <if test="deviceMemo5 != null  and deviceMemo5 != ''"> and device_memo5 = #{deviceMemo5}</if>
+        </where>
+    </select>
+    
+    <select id="selectDeviceByDeviceId" parameterType="Long" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        where device_id = #{deviceId}
+    </select>
+        
+    <insert id="insertDevice" parameterType="Device">
+        insert into tt_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceId != null">device_id,</if>
+            <if test="mechId != null">mech_id,</if>
+            <if test="mechOwn != null">mech_own,</if>
+            <if test="deviveName != null">devive_name,</if>
+            <if test="deviceNo != null">device_no,</if>
+            <if test="deviceStatus != null">device_status,</if>
+            <if test="deviceMemo1 != null">device_memo1,</if>
+            <if test="deviceMemo2 != null">device_memo2,</if>
+            <if test="deviceMemo3 != null">device_memo3,</if>
+            <if test="deviceMemo4 != null">device_memo4,</if>
+            <if test="deviceMemo5 != null">device_memo5,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="mechId != null">#{mechId},</if>
+            <if test="mechOwn != null">#{mechOwn},</if>
+            <if test="deviveName != null">#{deviveName},</if>
+            <if test="deviceNo != null">#{deviceNo},</if>
+            <if test="deviceStatus != null">#{deviceStatus},</if>
+            <if test="deviceMemo1 != null">#{deviceMemo1},</if>
+            <if test="deviceMemo2 != null">#{deviceMemo2},</if>
+            <if test="deviceMemo3 != null">#{deviceMemo3},</if>
+            <if test="deviceMemo4 != null">#{deviceMemo4},</if>
+            <if test="deviceMemo5 != null">#{deviceMemo5},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDevice" parameterType="Device">
+        update tt_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="mechId != null">mech_id = #{mechId},</if>
+            <if test="mechOwn != null">mech_own = #{mechOwn},</if>
+            <if test="deviveName != null">devive_name = #{deviveName},</if>
+            <if test="deviceNo != null">device_no = #{deviceNo},</if>
+            <if test="deviceStatus != null">device_status = #{deviceStatus},</if>
+            <if test="deviceMemo1 != null">device_memo1 = #{deviceMemo1},</if>
+            <if test="deviceMemo2 != null">device_memo2 = #{deviceMemo2},</if>
+            <if test="deviceMemo3 != null">device_memo3 = #{deviceMemo3},</if>
+            <if test="deviceMemo4 != null">device_memo4 = #{deviceMemo4},</if>
+            <if test="deviceMemo5 != null">device_memo5 = #{deviceMemo5},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where device_id = #{deviceId}
+    </update>
+
+    <delete id="deleteDeviceByDeviceId" parameterType="Long">
+        delete from tt_device where device_id = #{deviceId}
+    </delete>
+
+    <delete id="deleteDeviceByDeviceIds" parameterType="String">
+        delete from tt_device where device_id in 
+        <foreach item="deviceId" collection="array" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+    </delete>
+
+</mapper>
