@@ -55,7 +55,7 @@
         var types = [[${@dict.getType('sys_notice_type')}]];
         var datas = [[${@dict.getType('sys_notice_status')}]];
         var prefix = ctx + "system/notice";
-
+		var obj = {};
         $(function() {
             var options = {
                 url: prefix + "/list",
@@ -66,10 +66,7 @@
                 columns: [{
 		            checkbox: true
 		        },
-				{
-					field : 'noticeId', 
-					title : '序号' 
-				},
+
 				{
 					field : 'noticeTitle', 
 					title : '公告标题' 
@@ -82,6 +79,14 @@
 		            	return $.table.selectDictLabel(types, value);
 		            }
 		        },
+				{
+					field : 'noticeContent',
+					title : '详情',
+					formatter: function(value, row, index) {
+						obj[row.noticeId] = row.noticeContent;
+						return "<a onclick='contentDetail("+row.noticeId+")'>详情</a>";
+					}
+				},
 				{
 		            field: 'status',
 		            title: '状态',
@@ -112,6 +117,19 @@
             };
             $.table.init(options);
         });
+		function contentDetail(noticeId){
+			layer.open({
+				type: 1,
+				maxmin:true,
+				shade: false,
+				area : [ '600px', '400px' ],
+				title: false, //不显示标题
+				content: obj[noticeId],
+				cancel: function () {
+					//layer.msg('图片查看结束！', { time: 5000, icon: 6 });
+				}
+			});
+		}
     </script>
 </body>
 </html>
