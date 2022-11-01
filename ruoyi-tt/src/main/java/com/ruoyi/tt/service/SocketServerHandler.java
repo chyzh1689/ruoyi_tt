@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author xxxx
@@ -23,15 +24,18 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
     private static final Logger log = LoggerFactory.getLogger(SocketServerHandler.class);
     private static ChannelGroup group = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-    public static List<String> msgs = new ArrayList<>();
+    public static List<String> msgs = new CopyOnWriteArrayList();
     static {
-        msgs.add(DateUtils.getTime()+":"+"测试消息，请忽略！！！");
+        msgs.add(DateUtils.getTime()+"："+"测试消息，请忽略(保留最近30条)！！！");
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         log.info("{},{}",ctx.channel().remoteAddress(),msg);
-        msgs.add(DateUtils.getTime() + ":" + msg.toString());
+        msgs.add(0,DateUtils.getTime() + "：" + msg.toString());
+        if(msgs.size()>30){
+            msgs.remove(msgs.size()-1);
+        }
         ctx.channel().writeAndFlush("from socketServer,"+ msg);
 
     }
