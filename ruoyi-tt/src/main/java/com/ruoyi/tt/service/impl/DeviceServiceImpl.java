@@ -44,8 +44,7 @@ public class DeviceServiceImpl implements IDeviceService
      * @return 设备信息
      */
     @Override
-    public List<Device> selectDeviceList(Device device)
-    {
+    public List<Device> selectDeviceList(Device device)    {
         return deviceMapper.selectDeviceList(device);
     }
 

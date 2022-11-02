@@ -11,8 +11,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * @author xxxxxx
  * @date 2022-10-22
  */
-public class Device extends BaseEntity
-{
+public class Device extends BaseEntity{
     private static final long serialVersionUID = 1L;
 
     /** 设备Id */

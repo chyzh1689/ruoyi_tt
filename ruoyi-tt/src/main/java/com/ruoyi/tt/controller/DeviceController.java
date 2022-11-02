@@ -56,8 +56,7 @@ public class DeviceController extends BaseController{
     @RequiresPermissions("tt:device:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(Device device)
-    {
+    public TableDataInfo list(Device device){
         startPage();
         List<Device> list = deviceService.selectDeviceList(device);
         return getDataTable(list);
