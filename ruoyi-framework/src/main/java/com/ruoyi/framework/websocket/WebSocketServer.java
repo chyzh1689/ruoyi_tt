@@ -39,15 +39,13 @@ public class WebSocketServer{
         boolean semaphoreFlag = false;
         // 尝试获取信号量
         semaphoreFlag = SemaphoreUtils.tryAcquire(socketSemaphore);
-        if (!semaphoreFlag)
-        {
+        if (!semaphoreFlag)        {
             // 未获取到信号量
             LOGGER.error("\n 当前在线人数超过限制数- {}", socketMaxOnlineCount);
             WebSocketUsers.sendMessageToUserByText(session, "当前在线人数超过限制数：" + socketMaxOnlineCount);
             session.close();
         }
-        else
-        {
+        else {
             // 添加用户
             WebSocketUsers.put(session.getId(), session);
             LOGGER.info("\n 建立连接 - {}", session);
@@ -72,10 +70,8 @@ public class WebSocketServer{
      * 抛出异常时处理
      */
     @OnError
-    public void onError(Session session, Throwable exception) throws Exception
-    {
-        if (session.isOpen())
-        {
+    public void onError(Session session, Throwable exception) throws Exception    {
+        if (session.isOpen())        {
             // 关闭连接
             session.close();
         }
@@ -92,8 +88,7 @@ public class WebSocketServer{
      * 服务器接收到客户端消息时调用的方法
      */
     @OnMessage
-    public void onMessage(String message, Session session)
-    {
+    public void onMessage(String message, Session session)    {
         String msg = message.replace("你", "我").replace("吗", "");
         WebSocketUsers.sendMessageToUserByText(session, msg);
     }

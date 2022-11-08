@@ -3,9 +3,165 @@
 <head>
     <th:block th:include="include :: header('我的设备连接信息')" />
 </head>
-<body class="gray-bg">
-     <div class="container-div">
+<style>
+    .xxxxxx_lt{
+        width: 99%;
+    }
+    .xxxxxx_lt ul li{
+        list-style: none;
+    }
+    /*左边部分*/
+    .xxxxxx_lt .left_nav{
+        width: 17%;
+        height: 587px;
+        display: inline-block;
+        padding: 2px;
+        margin-left: 2px;
+        margin-top: 1px;;
+        border: 1px solid grey;
+        overflow-y:scroll;
+    }
+    .xxxxxx_lt .left_nav ul{
+        padding: 3px;
+    }
+    .xxxxxx_lt .left_nav li{
+        margin-top: 4px;
+    }
+    .xxxxxx_lt .left_nav li a{
+        display: block;
+        margin-left: 2px;
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+    }
 
+    /*右边部分*/
+    .xxxxxx_lt .right_content{
+        display: inline-block;
+        width: 82%;
+        float: right;
+        border: 2px solid black;
+    }
+
+    /*右边上方*/
+    .xxxxxx_lt .right_content .top_nav{
+        display: inline-block;
+        padding: 4px;
+        margin: 5px;
+    }
+    .xxxxxx_lt .right_content .top_nav span{
+        float: left;
+        padding: 3px;
+        background-color: #00f7de;
+        margin: 3px;
+        font-weight: bold;
+        border: 2px solid black;
+    }
+    /*右下方*/
+    .xxxxxx_lt .right_content .bottom_content{
+
+    }
+    /*右下左边账号部分*/
+    .xxxxxx_lt .right_content .bottom_content .left_zh_nav{
+        width: 17%;
+        height: 522px;
+        display: inline-block;
+        padding: 2px;
+        margin-left: 2px;
+        margin-top: 1px;;
+        border: 1px solid grey;
+        overflow-y:scroll;
+    }
+    .xxxxxx_lt .left_zh_nav ul{
+        padding: 3px;
+    }
+    .xxxxxx_lt .left_zh_nav li{
+        margin-top: 4px;
+    }
+    .xxxxxx_lt .left_zh_nav li a{
+        display: block;
+        margin-left: 2px;
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+    }
+
+    /*右下右边区域*/
+    .xxxxxx_lt .right_content .bottom_content .right_area{
+        display: inline-block;
+        width: 82%;
+        float: right;
+    }
+    /*右下右边区域  中间内容*/
+    .xxxxxx_lt .right_content .bottom_content .middle_content{
+        display: inline-block;
+        width: 69%;
+        border: 2px solid black;
+    }
+    .xxxxxx_lt .right_content .bottom_content .right_gzz{
+        display: inline-block;
+        width: 30%;
+        height: 522px;
+        padding: 2px;
+        margin-left: 2px;
+        margin-top: 1px;;
+        border: 1px solid grey;
+        overflow-y:scroll;
+    }
+    .xxxxxx_lt .right_content .bottom_content .right_gzz ul{
+        padding: 3px;
+    }
+    .xxxxxx_lt .right_content .bottom_content .right_gzz li a{
+        display: block;
+        text-align: right;
+        margin-left: 2px;
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+    }
+    /*右下右边区域  右边*/
+</style>
+<body class="gray-bg">
+    <div class="xxxxxx_lt">
+        <div class="left_nav">
+            <ul>
+                <li><a>设备1---设备1---设备1---S#$#$#4545wwJg</a></li>
+                <li><a>设备2</a></li>
+                <li><a>设备1</a></li>
+                <li><a>设备2</a></li>
+            </ul>
+        </div>
+        <div class="right_content">
+            <div class="top_nav">
+                <span>ALL-所有</span>
+                <span>TT-推特</span>
+                <span>FB-facebook</span>
+                <span>ALL-所有</span>
+                <span>TT-推特</span>
+            </div>
+            <div style="clear: both"></div>
+            <div class="bottom_content">
+                <div class="left_zh_nav">
+                    <ul>
+                        <li><a>TT-账号1</a></li>
+                        <li><a>FB-账号2</a></li>
+                    </ul>
+                </div>
+                <div class="right_area">
+                    <div class="middle_content">
+                        展示内容
+                    </div>
+                    <div class="right_gzz">
+                        <ul>
+                            <li><a>关注者1</a></li>
+                            <li><a>关注者2</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
     </div>
     <th:block th:include="include :: footer" />
     <script th:inline="javascript">

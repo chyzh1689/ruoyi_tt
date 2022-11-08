@@ -5,7 +5,7 @@ package com.ruoyi.tt.enums;
  */
 public enum YesOrNoStatus {
     YES("0"),
-    No("1");
+    NO("1");
     private String val;
 
     YesOrNoStatus (String val){

@@ -14,11 +14,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="mechMemo"    column="mech_memo"    />
         <result property="mechStatus"    column="mech_status"    />
         <result property="mechType"    column="mech_type"    />
+        <result property="mechChannel"    column="mech_channel"    />
         <result property="mechMemo1"    column="mech_memo1"    />
         <result property="mechMemo2"    column="mech_memo2"    />
-        <result property="mechMemo3"    column="mech_memo3"    />
-        <result property="mechMemo4"    column="mech_memo4"    />
-        <result property="mechMemo5"    column="mech_memo5"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -28,8 +26,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectMechantVo">
         select mech_id, parent_id,
                (select par.mech_name from tt_mechant  par where par.mech_id = mech.parent_id) par_mech_name,
-               mech_name, mech_no, mech_phone, mech_memo, mech_status, mech_type,
-        mech_memo1, mech_memo2, mech_memo3, mech_memo4, mech_memo5, create_by, create_time, update_by, update_time from tt_mechant mech
+               mech_name, mech_no, mech_phone, mech_memo, mech_status, mech_type,mech_channel,
+        mech_memo1, mech_memo2, create_by, create_time, update_by, update_time from tt_mechant mech
     </sql>
 
     <select id="selectMechantList" parameterType="Mechant" resultMap="MechantResult">
@@ -42,11 +40,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mechMemo != null  and mechMemo != ''"> and mech_memo = #{mechMemo}</if>
             <if test="mechStatus != null  and mechStatus != ''"> and mech_status = #{mechStatus}</if>
             <if test="mechType != null  and mechType != ''"> and mech_type = #{mechType}</if>
+            <if test="mechChannel != null "> and mech_channel = #{mechChannel}</if>
             <if test="mechMemo1 != null  and mechMemo1 != ''"> and mech_memo1 = #{mechMemo1}</if>
             <if test="mechMemo2 != null  and mechMemo2 != ''"> and mech_memo2 = #{mechMemo2}</if>
-            <if test="mechMemo3 != null  and mechMemo3 != ''"> and mech_memo3 = #{mechMemo3}</if>
-            <if test="mechMemo4 != null  and mechMemo4 != ''"> and mech_memo4 = #{mechMemo4}</if>
-            <if test="mechMemo5 != null  and mechMemo5 != ''"> and mech_memo5 = #{mechMemo5}</if>
         </where>
     </select>
     
@@ -54,7 +50,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectMechantVo"/>
         where mech_id = #{mechId}
     </select>
-        
+
     <insert id="insertMechant" parameterType="Mechant">
         insert into tt_mechant
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -66,16 +62,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mechMemo != null">mech_memo,</if>
             <if test="mechStatus != null">mech_status,</if>
             <if test="mechType != null">mech_type,</if>
+            <if test="mechChannel != null">mech_channel,</if>
             <if test="mechMemo1 != null">mech_memo1,</if>
             <if test="mechMemo2 != null">mech_memo2,</if>
-            <if test="mechMemo3 != null">mech_memo3,</if>
-            <if test="mechMemo4 != null">mech_memo4,</if>
-            <if test="mechMemo5 != null">mech_memo5,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
-         </trim>
+        </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="mechId != null">#{mechId},</if>
             <if test="parentId != null">#{parentId},</if>
@@ -85,16 +79,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mechMemo != null">#{mechMemo},</if>
             <if test="mechStatus != null">#{mechStatus},</if>
             <if test="mechType != null">#{mechType},</if>
+            <if test="mechChannel != null">#{mechChannel},</if>
             <if test="mechMemo1 != null">#{mechMemo1},</if>
             <if test="mechMemo2 != null">#{mechMemo2},</if>
-            <if test="mechMemo3 != null">#{mechMemo3},</if>
-            <if test="mechMemo4 != null">#{mechMemo4},</if>
-            <if test="mechMemo5 != null">#{mechMemo5},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
-         </trim>
+        </trim>
     </insert>
 
     <update id="updateMechant" parameterType="Mechant">
@@ -107,11 +99,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mechMemo != null">mech_memo = #{mechMemo},</if>
             <if test="mechStatus != null">mech_status = #{mechStatus},</if>
             <if test="mechType != null">mech_type = #{mechType},</if>
+            <if test="mechChannel != null">mech_channel = #{mechChannel},</if>
             <if test="mechMemo1 != null">mech_memo1 = #{mechMemo1},</if>
             <if test="mechMemo2 != null">mech_memo2 = #{mechMemo2},</if>
-            <if test="mechMemo3 != null">mech_memo3 = #{mechMemo3},</if>
-            <if test="mechMemo4 != null">mech_memo4 = #{mechMemo4},</if>
-            <if test="mechMemo5 != null">mech_memo5 = #{mechMemo5},</if>
             <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>

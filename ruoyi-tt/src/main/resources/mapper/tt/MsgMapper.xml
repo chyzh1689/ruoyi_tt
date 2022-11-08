@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.tt.mapper.MsgMapper">
+    
+    <resultMap type="Msg" id="MsgResult">
+        <result property="msgId"    column="msg_id"    />
+        <result property="mechId"    column="mech_id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="ownId"    column="own_id"    />
+        <result property="msgChannel"    column="msg_channel"    />
+        <result property="accountNo"    column="account_no"    />
+        <result property="accountName"    column="account_name"    />
+        <result property="noticeNo"    column="notice_no"    />
+        <result property="noticeName"    column="notice_name"    />
+        <result property="msgContent"    column="msg_content"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectMsgVo">
+        select msg_id, mech_id, device_id, own_id, msg_channel, account_no, account_name, notice_no, notice_name, msg_content, create_time from tt_msg
+    </sql>
+
+    <select id="selectMsgList" parameterType="Msg" resultMap="MsgResult">
+        <include refid="selectMsgVo"/>
+        <where>  
+            <if test="mechId != null "> and mech_id = #{mechId}</if>
+            <if test="deviceId != null "> and device_id = #{deviceId}</if>
+            <if test="ownId != null "> and own_id = #{ownId}</if>
+            <if test="msgChannel != null  and msgChannel != ''"> and msg_channel = #{msgChannel}</if>
+            <if test="accountNo != null  and accountNo != ''"> and account_no = #{accountNo}</if>
+            <if test="accountName != null  and accountName != ''"> and account_name like concat('%', #{accountName}, '%')</if>
+            <if test="noticeNo != null  and noticeNo != ''"> and notice_no = #{noticeNo}</if>
+            <if test="noticeName != null  and noticeName != ''"> and notice_name like concat('%', #{noticeName}, '%')</if>
+            <if test="msgContent != null  and msgContent != ''"> and msg_content = #{msgContent}</if>
+        </where>
+    </select>
+    
+    <select id="selectMsgByMsgId" parameterType="Long" resultMap="MsgResult">
+        <include refid="selectMsgVo"/>
+        where msg_id = #{msgId}
+    </select>
+        
+    <insert id="insertMsg" parameterType="Msg">
+        insert into tt_msg
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="msgId != null">msg_id,</if>
+            <if test="mechId != null">mech_id,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="ownId != null">own_id,</if>
+            <if test="msgChannel != null">msg_channel,</if>
+            <if test="accountNo != null">account_no,</if>
+            <if test="accountName != null">account_name,</if>
+            <if test="noticeNo != null">notice_no,</if>
+            <if test="noticeName != null">notice_name,</if>
+            <if test="msgContent != null">msg_content,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="msgId != null">#{msgId},</if>
+            <if test="mechId != null">#{mechId},</if>
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="ownId != null">#{ownId},</if>
+            <if test="msgChannel != null">#{msgChannel},</if>
+            <if test="accountNo != null">#{accountNo},</if>
+            <if test="accountName != null">#{accountName},</if>
+            <if test="noticeNo != null">#{noticeNo},</if>
+            <if test="noticeName != null">#{noticeName},</if>
+            <if test="msgContent != null">#{msgContent},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMsg" parameterType="Msg">
+        update tt_msg
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="mechId != null">mech_id = #{mechId},</if>
+            <if test="deviceId != null">device_id = #{deviceId},</if>
+            <if test="ownId != null">own_id = #{ownId},</if>
+            <if test="msgChannel != null">msg_channel = #{msgChannel},</if>
+            <if test="accountNo != null">account_no = #{accountNo},</if>
+            <if test="accountName != null">account_name = #{accountName},</if>
+            <if test="noticeNo != null">notice_no = #{noticeNo},</if>
+            <if test="noticeName != null">notice_name = #{noticeName},</if>
+            <if test="msgContent != null">msg_content = #{msgContent},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where msg_id = #{msgId}
+    </update>
+
+    <delete id="deleteMsgByMsgId" parameterType="Long">
+        delete from tt_msg where msg_id = #{msgId}
+    </delete>
+
+    <delete id="deleteMsgByMsgIds" parameterType="String">
+        delete from tt_msg where msg_id in 
+        <foreach item="msgId" collection="array" open="(" separator="," close=")">
+            #{msgId}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -5,67 +5,113 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.tt.mapper.NoticeMapper">
     
     <resultMap type="Notice" id="NoticeResult">
-        <result property="accountId"    column="account_id"    />
-        <result property="noticeId"    column="notice_id"    />
         <result property="noticeNo"    column="notice_no"    />
+        <result property="mechantId"    column="mechant_id"    />
+        <result property="channelPackage"    column="channel_package"    />
         <result property="noticeName"    column="notice_name"    />
+        <result property="noticeImgRul"    column="notice_img_rul"    />
+        <result property="noticeLocation"    column="notice_location"    />
+        <result property="noticeFlag"    column="notice_flag"    />
+        <result property="ownNo"    column="own_no"    />
+        <result property="ownName"    column="own_name"    />
+        <result property="ownImgUrl"    column="own_img_url"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
     </resultMap>
 
     <sql id="selectNoticeVo">
-        select account_id, notice_id, notice_no, notice_name, create_time from tt_notice
+        select notice_no, mechant_id, channel_package, notice_name, notice_img_rul, notice_location, notice_flag, own_no, own_name, own_img_url, device_id, create_by, create_time, update_by, update_time from tt_notice
     </sql>
 
     <select id="selectNoticeList" parameterType="Notice" resultMap="NoticeResult">
         <include refid="selectNoticeVo"/>
         <where>  
-            <if test="noticeNo != null  and noticeNo != ''"> and notice_no = #{noticeNo}</if>
             <if test="noticeName != null  and noticeName != ''"> and notice_name like concat('%', #{noticeName}, '%')</if>
+            <if test="noticeImgRul != null  and noticeImgRul != ''"> and notice_img_rul = #{noticeImgRul}</if>
+            <if test="noticeLocation != null  and noticeLocation != ''"> and notice_location = #{noticeLocation}</if>
+            <if test="noticeFlag != null "> and notice_flag = #{noticeFlag}</if>
+            <if test="ownNo != null  and ownNo != ''"> and own_no = #{ownNo}</if>
+            <if test="ownName != null  and ownName != ''"> and own_name like concat('%', #{ownName}, '%')</if>
+            <if test="ownImgUrl != null  and ownImgUrl != ''"> and own_img_url = #{ownImgUrl}</if>
+            <if test="deviceId != null "> and device_id = #{deviceId}</if>
         </where>
     </select>
     
-    <select id="selectNoticeByAccountId" parameterType="Long" resultMap="NoticeResult">
+    <select id="selectNoticeByNoticeNo" parameterType="String" resultMap="NoticeResult">
         <include refid="selectNoticeVo"/>
-        where account_id = #{accountId}
+        where notice_no = #{noticeNo}
     </select>
         
     <insert id="insertNotice" parameterType="Notice">
         insert into tt_notice
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="accountId != null">account_id,</if>
-            <if test="noticeId != null">notice_id,</if>
-            <if test="noticeNo != null and noticeNo != ''">notice_no,</if>
+            <if test="noticeNo != null">notice_no,</if>
+            <if test="mechantId != null">mechant_id,</if>
+            <if test="channelPackage != null">channel_package,</if>
             <if test="noticeName != null">notice_name,</if>
+            <if test="noticeImgRul != null">notice_img_rul,</if>
+            <if test="noticeLocation != null">notice_location,</if>
+            <if test="noticeFlag != null">notice_flag,</if>
+            <if test="ownNo != null">own_no,</if>
+            <if test="ownName != null">own_name,</if>
+            <if test="ownImgUrl != null">own_img_url,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="accountId != null">#{accountId},</if>
-            <if test="noticeId != null">#{noticeId},</if>
-            <if test="noticeNo != null and noticeNo != ''">#{noticeNo},</if>
+            <if test="noticeNo != null">#{noticeNo},</if>
+            <if test="mechantId != null">#{mechantId},</if>
+            <if test="channelPackage != null">#{channelPackage},</if>
             <if test="noticeName != null">#{noticeName},</if>
+            <if test="noticeImgRul != null">#{noticeImgRul},</if>
+            <if test="noticeLocation != null">#{noticeLocation},</if>
+            <if test="noticeFlag != null">#{noticeFlag},</if>
+            <if test="ownNo != null">#{ownNo},</if>
+            <if test="ownName != null">#{ownName},</if>
+            <if test="ownImgUrl != null">#{ownImgUrl},</if>
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
          </trim>
     </insert>
 
     <update id="updateNotice" parameterType="Notice">
         update tt_notice
         <trim prefix="SET" suffixOverrides=",">
-            <if test="noticeId != null">notice_id = #{noticeId},</if>
-            <if test="noticeNo != null and noticeNo != ''">notice_no = #{noticeNo},</if>
+            <if test="mechantId != null">mechant_id = #{mechantId},</if>
+            <if test="channelPackage != null">channel_package = #{channelPackage},</if>
             <if test="noticeName != null">notice_name = #{noticeName},</if>
+            <if test="noticeImgRul != null">notice_img_rul = #{noticeImgRul},</if>
+            <if test="noticeLocation != null">notice_location = #{noticeLocation},</if>
+            <if test="noticeFlag != null">notice_flag = #{noticeFlag},</if>
+            <if test="ownNo != null">own_no = #{ownNo},</if>
+            <if test="ownName != null">own_name = #{ownName},</if>
+            <if test="ownImgUrl != null">own_img_url = #{ownImgUrl},</if>
+            <if test="deviceId != null">device_id = #{deviceId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
         </trim>
-        where account_id = #{accountId}
+        where notice_no = #{noticeNo}
     </update>
 
-    <delete id="deleteNoticeByAccountId" parameterType="Long">
-        delete from tt_notice where account_id = #{accountId}
+    <delete id="deleteNoticeByNoticeNo" parameterType="String">
+        delete from tt_notice where notice_no = #{noticeNo}
     </delete>
 
-    <delete id="deleteNoticeByAccountIds" parameterType="String">
-        delete from tt_notice where account_id in 
-        <foreach item="accountId" collection="array" open="(" separator="," close=")">
-            #{accountId}
+    <delete id="deleteNoticeByNoticeNos" parameterType="String">
+        delete from tt_notice where notice_no in 
+        <foreach item="noticeNo" collection="array" open="(" separator="," close=")">
+            #{noticeNo}
         </foreach>
     </delete>
 
