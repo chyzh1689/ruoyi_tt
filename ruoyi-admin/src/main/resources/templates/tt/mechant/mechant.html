@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head>
-    <th:block th:include="include :: header('商户信息列表')" />
+    <th:block th:include="include :: header('员工信息列表')" />
 </head>
 <body class="gray-bg">
      <div class="container-div">
@@ -69,6 +69,7 @@
         var addSubFlag = [[${@permission.hasPermi('tt:mechant:addSub')}]];
         var prefix = ctx + "tt/mechant";
         var mechTypes = [[${@dict.getType('tt_mech_type')}]];
+        var channelPackages = [[${@dict.getType('tt_channel_package')}]];
         $(function() {
             var options = {
                 url: prefix + "/list",
@@ -76,7 +77,7 @@
                 updateUrl: prefix + "/edit/{id}",
                 removeUrl: prefix + "/remove",
                 exportUrl: prefix + "/export",
-                modalName: "商户信息",
+                modalName: "员工信息",
                 columns: [{
                     checkbox: true
                 },
@@ -113,13 +114,26 @@
                     }
                 },
                 {
+                    field: 'channels',
+                    title: '渠道',
+                    formatter: function(value, row, index) {
+                        if(row.channels){
+                            return row.channels.split(",").reduce((label,item)=>{
+                                return label+$.table.selectDictLabel(channelPackages, item)+","
+                            },"");
+                        }
+                        return "";
+                    }
+                },
+                {
                     field: 'createTime',
                     title: '创建时间',
                     sortable: true
                 },
                 {
                     field: 'mechMemo',
-                    title: '备注信息'
+                    title: '备注信息',
+                    visible: false
                 },
 
 
@@ -136,16 +150,6 @@
                 {
                     field: 'mechMemo3',
                     title: '备注3',
-                    visible: false
-                },
-                {
-                    field: 'mechMemo4',
-                    title: '备注4',
-                    visible: false
-                },
-                {
-                    field: 'mechMemo5',
-                    title: '备注5',
                     visible: false
                 },
                 {
@@ -175,14 +179,14 @@
 
         /* 状态-停用 */
         function disable(mechId) {
-            $.modal.confirm("确认要禁用该设备吗？", function() {
+            $.modal.confirm("确认要禁用该人员吗？", function() {
                 $.operate.post(prefix + "/changeStatus", { "mechId": mechId, "mechStatus": 1 });
             })
         }
 
         /* 状态启用 */
         function enable(mechId) {
-            $.modal.confirm("确认要启用该设备吗？", function() {
+            $.modal.confirm("确认要启用该人员吗？", function() {
                 $.operate.post(prefix + "/changeStatus", { "mechId": mechId, "mechStatus": 0 });
             })
         }

@@ -6,7 +6,9 @@ import com.ruoyi.common.core.domain.entity.SysMenu;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.utils.ShiroUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.tt.domain.Device;
+import com.ruoyi.tt.enums.ChannelPackage;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -60,6 +62,9 @@ public class MechantController extends BaseController
         }
         startPage();
         List<Mechant> list = mechantService.selectMechantList(mechant);
+        for (Mechant mech : list) {
+            mech.setChannels(ChannelPackage.toChannelStr(mech.getMechChannel()));
+        }
         return getDataTable(list);
     }
 
@@ -102,6 +107,14 @@ public class MechantController extends BaseController
     @ResponseBody
     public AjaxResult addSave(Mechant mechant)    {
         mechant.setCreateBy(getLoginName());
+        //设置可用渠道
+        mechant.setMechChannel(0);
+        String channels = mechant.getChannels();
+        if(StringUtils.isNotEmpty(channels)){
+            for (String code : channels.split(",")) {
+                mechant.setMechChannel(ChannelPackage.addChannel(mechant.getMechChannel(),code));
+            }
+        }
         return mechantService.insertMechant(mechant);
     }
 
@@ -110,9 +123,9 @@ public class MechantController extends BaseController
      */
     @RequiresPermissions("tt:mechant:edit")
     @GetMapping("/edit/{mechId}")
-    public String edit(@PathVariable("mechId") Long mechId, ModelMap mmap)
-    {
+    public String edit(@PathVariable("mechId") Long mechId, ModelMap mmap)    {
         Mechant mechant = mechantService.selectMechantByMechId(mechId);
+        mechant.setChannels(ChannelPackage.toChannelStr(mechant.getMechChannel()));
         mmap.put("mechant", mechant);
         return prefix + "/edit";
     }
@@ -133,8 +146,15 @@ public class MechantController extends BaseController
     @Log(title = "商户信息", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(Mechant mechant)
-    {
+    public AjaxResult editSave(Mechant mechant)    {
+        //设置可用渠道
+        mechant.setMechChannel(0);
+        String channels = mechant.getChannels();
+        if(StringUtils.isNotEmpty(channels)){
+            for (String code : channels.split(",")) {
+                mechant.setMechChannel(ChannelPackage.addChannel(mechant.getMechChannel(),code));
+            }
+        }
         return toAjax(mechantService.updateMechant(mechant));
     }
 

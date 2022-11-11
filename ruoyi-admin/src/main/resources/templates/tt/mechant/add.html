@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh" xmlns:th="http://www.thymeleaf.org" >
 <head>
-    <th:block th:include="include :: header('新增商户信息')" />
+    <th:block th:include="include :: header('新增信息')" />
 </head>
 <body class="white-bg">
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
@@ -21,6 +21,23 @@
                 <label class="col-sm-2 control-label">名称：</label>
                 <div class="col-sm-4">
                     <input name="mechName" class="form-control" type="text" maxlength="20">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">状态：</label>
+                <div class="col-sm-4">
+                    <label class="toggle-switch switch-solid">
+                        <input type="checkbox" id="status" checked>
+                        <span></span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group" th:if="${mechant.parentId==0}">
+                <label class="col-sm-2 control-label">渠道：</label>
+                <div class="col-sm-10">
+                    <label th:each="dict:${@dict.getType('tt_channel_package')}" class="check-box">
+                        <input name="channels" type="checkbox" th:value="${dict.dictValue}" th:text="${dict.dictLabel}">
+                    </label>
                 </div>
             </div>
             <div class="form-group">    
@@ -46,7 +63,12 @@
 
         function submitHandler() {
             if ($.validate.form()) {
-                $.operate.save(prefix + "/add", $('#form-mechant-add').serialize());
+                var data = $("#form-mechant-add").serializeArray();
+                var channels = $.form.selectCheckeds("channels");
+                var status = $("input[id='status']").is(':checked') == true ? 0 : 1;
+                data.push({"name": "channels", "value": channels});
+                data.push({"name": "mechStatus", "value": status});
+                $.operate.save(prefix + "/add", data);
             }
         }
     </script>

@@ -18,6 +18,7 @@ import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.tt.TTContants;
+import com.ruoyi.tt.enums.ChannelPackage;
 import com.ruoyi.tt.enums.MechType;
 import com.ruoyi.tt.enums.YesOrNoStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +53,7 @@ public class MechantServiceImpl implements IMechantService {
      * @return 商户信息
      */
     @Override
-    public Mechant selectMechantByMechId(Long mechId)
-    {
+    public Mechant selectMechantByMechId(Long mechId)  {
         return mechantMapper.selectMechantByMechId(mechId);
     }
 
@@ -64,8 +64,7 @@ public class MechantServiceImpl implements IMechantService {
      * @return 商户信息
      */
     @Override
-    public List<Mechant> selectMechantList(Mechant mechant)
-    {
+    public List<Mechant> selectMechantList(Mechant mechant)    {
         return mechantMapper.selectMechantList(mechant);
     }
 
@@ -98,6 +97,7 @@ public class MechantServiceImpl implements IMechantService {
         user.setSalt(ShiroUtils.randomSalt());
         user.setLoginName(mechant.getMechNo());
         user.setPassword(passwordService.encryptPassword(user.getLoginName(), initPassword, user.getSalt()));
+        user.setUserName(mechant.getMechName());
         user.setCreateBy(mechant.getCreateBy());
         userService.insertUser(user);
 
@@ -116,6 +116,14 @@ public class MechantServiceImpl implements IMechantService {
     @Override
     public int updateMechant(Mechant mechant){
         mechant.setUpdateTime(DateUtils.getNowDate());
+        //设置可用渠道
+        mechant.setMechChannel(0);
+        String channels = mechant.getChannels();
+        if(StringUtils.isNotEmpty(channels)){
+            for (String code : channels.split(",")) {
+                mechant.setMechChannel(ChannelPackage.addChannel(mechant.getMechChannel(),code));
+            }
+        }
         SysUser user = userMapper.selectUserById(mechant.getMechId());
         user.setUpdateTime(mechant.getUpdateTime());
         user.setPhonenumber(mechant.getMechPhone());

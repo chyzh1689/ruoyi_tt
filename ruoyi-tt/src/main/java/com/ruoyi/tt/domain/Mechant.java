@@ -51,7 +51,7 @@ public class Mechant extends BaseEntity{
 
     /** 商户可用渠道 */
     @Excel(name = "商户可用渠道")
-    private Long mechChannel;
+    private Integer mechChannel;
 
     /** 备注1 */
     @Excel(name = "备注1")
@@ -65,5 +65,7 @@ public class Mechant extends BaseEntity{
     @Excel(name = "商户名称")
     private String parMechName;
 
+    /**用于界面**/
+    private String channels;
 
 }
