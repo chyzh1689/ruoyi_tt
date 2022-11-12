@@ -107,6 +107,15 @@
                     }
                 },
                 {
+                    field: 'deviceStartTime',
+                    title: '激活日期',
+                    sortable: true,
+                    formatter: function (value, row, index) {
+                        return (row.deviceStartTime?row.deviceStartTime:"")+" - " +
+                            (row.deviceEndTime?row.deviceEndTime:"");
+                    }
+                },
+                {
                     field: 'createTime',
                     title: '创建时间',
                     sortable: true

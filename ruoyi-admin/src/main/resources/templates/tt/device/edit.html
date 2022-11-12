@@ -28,6 +28,25 @@
                     <input name="deviceNo" th:field="*{deviceNo}" class="form-control" type="text">
                 </div>
             </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">状态：</label>
+                <div class="col-sm-4">
+                    <label class="toggle-switch switch-solid">
+                        <input type="checkbox" id="status" th:checked="${device.deviceStatus == '0' ? true : false}">
+                        <span></span>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">设备激活日期： </label>
+                <div class="col-sm-10">
+                    <input th:value="${#dates.format(device.deviceStartTime, 'yyyy-MM-dd')}" style="display:inline-block;width: 120px"
+                           class="form-control time-input" id="startTime" placeholder="激活开始日期" name="deviceStartTime"/>
+                    <span>-</span>
+                    <input th:value="${#dates.format(device.deviceEndTime, 'yyyy-MM-dd')}" style="display:inline-block;width: 120px"
+                           class="form-control time-input" id="endTime" placeholder="激活结束日期" name="deviceEndTime"/>
+                </div>
+            </div>
         </form>
     </div>
     <th:block th:include="include :: footer" />
@@ -39,7 +58,10 @@
 
         function submitHandler() {
             if ($.validate.form()) {
-                $.operate.save(prefix + "/edit", $('#form-device-edit').serialize());
+                var data = $("#form-device-edit").serializeArray();
+                var status = $("input[id='status']").is(':checked') == true ? 0 : 1;
+                data.push({"name": "deviceStatus", "value": status});
+                $.operate.save(prefix + "/edit", data);
             }
         }
         /* 用户管理-新增-选择商户树 */
@@ -61,6 +83,7 @@
             $("#treeName").val(body.find('#treeName').val());
             $.modal.close(index);
         }
+
     </script>
 </body>
 </html>
