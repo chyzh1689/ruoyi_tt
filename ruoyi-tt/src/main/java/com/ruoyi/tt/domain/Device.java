@@ -32,7 +32,7 @@ public class Device extends BaseEntity{
 
     /** 设备名称 */
     @Excel(name = "设备名称")
-    private String deviveName;
+    private String deviceName;
 
     /** 设备编码 */
     @Excel(name = "设备编码")

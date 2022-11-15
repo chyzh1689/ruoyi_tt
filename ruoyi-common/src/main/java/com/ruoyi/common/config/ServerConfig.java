@@ -11,8 +11,7 @@ import com.ruoyi.common.utils.ServletUtils;
  *
  */
 @Component
-public class ServerConfig
-{
+public class ServerConfig{
     /**
      * 获取完整的请求路径，包括：域名，端口，上下文访问路径
      * 

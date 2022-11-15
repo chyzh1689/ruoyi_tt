@@ -23,6 +23,10 @@ public class Account extends BaseEntity{
     @Excel(name = "设备Id")
     private Long deviceId;
 
+    /** 商户Id */
+    @Excel(name = "商户Id")
+    private Long mechantId;
+
     /** 账号 */
     @Excel(name = "账号")
     private String accountNo;
@@ -50,5 +54,9 @@ public class Account extends BaseEntity{
     /** 备注2 */
     @Excel(name = "备注2")
     private String accountMemo2;
+
+    private String deviceShow;
+
+    private String mechShow;
 
 }

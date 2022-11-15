@@ -6,7 +6,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     
     <resultMap type="Account" id="AccountResult">
         <result property="accountId"    column="account_id"    />
+        <result property="mechantId"    column="mechant_id"    />
+        <result property="mechShow"  column="mech_show"    />
         <result property="deviceId"    column="device_id"    />
+        <result property="deviceShow"    column="device_show"    />
         <result property="accountNo"    column="account_no"    />
         <result property="accountName"    column="account_name"    />
         <result property="accountImgUrl"    column="account_img_url"    />
@@ -21,12 +24,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectAccountVo">
-        select account_id, device_id, account_no, account_name, account_img_url, account_channel, account_status, account_memo1, account_memo2, create_by, create_time, update_by, update_time from tt_account
+        select account_id,
+               mechant_id,(select mech.mech_name from tt_mechant  mech where mech.mech_id = acc.mechant_id) mech_show,
+               device_id, (select devi.device_name from tt_device  devi where devi.device_id = acc.device_id) device_show,
+               account_no, account_name, account_img_url, account_channel, account_status, account_memo1, account_memo2, create_by, create_time, update_by, update_time from tt_account acc
     </sql>
 
     <select id="selectAccountList" parameterType="Account" resultMap="AccountResult">
         <include refid="selectAccountVo"/>
         <where>  
+            <if test="mechantId != null "> and mechant_id = #{mechantId}</if>
             <if test="deviceId != null "> and device_id = #{deviceId}</if>
             <if test="accountNo != null  and accountNo != ''"> and account_no = #{accountNo}</if>
             <if test="accountName != null  and accountName != ''"> and account_name like concat('%', #{accountName}, '%')</if>
@@ -47,6 +54,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         insert into tt_account
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="accountId != null">account_id,</if>
+            <if test="mechantId != null">mechant_id,</if>
             <if test="deviceId != null">device_id,</if>
             <if test="accountNo != null">account_no,</if>
             <if test="accountName != null">account_name,</if>
@@ -62,6 +70,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="accountId != null">#{accountId},</if>
+            <if test="mechantId != null">#{mechantId},</if>
             <if test="deviceId != null">#{deviceId},</if>
             <if test="accountNo != null">#{accountNo},</if>
             <if test="accountName != null">#{accountName},</if>
@@ -80,6 +89,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <update id="updateAccount" parameterType="Account">
         update tt_account
         <trim prefix="SET" suffixOverrides=",">
+            <if test="mechantId != null">mechant_id = #{mechantId},</if>
             <if test="deviceId != null">device_id = #{deviceId},</if>
             <if test="accountNo != null">account_no = #{accountNo},</if>
             <if test="accountName != null">account_name = #{accountName},</if>

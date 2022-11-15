@@ -10,7 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="mechName"    column="mech_name"    />
         <result property="mechOwn"    column="mech_own"    />
         <result property="mechOwnName"    column="mech_own_name"    />
-        <result property="deviveName"    column="devive_name"    />
+        <result property="deviceName"    column="device_name"    />
         <result property="deviceNo"    column="device_no"    />
         <result property="deviceStatus"    column="device_status"    />
         <result property="deviceStartTime"    column="device_start_time"    />
@@ -27,7 +27,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select device_id, mech_id, mech_own,
             (select mech.mech_name from tt_mechant  mech where mech.mech_id = dev.mech_id) mech_name,
             (select mech.mech_name from tt_mechant  mech where mech.mech_id = dev.mech_own) mech_own_name,
-            devive_name, device_no, device_status, device_start_time, device_end_time,
+               device_name, device_no, device_status, device_start_time, device_end_time,
                device_memo1, device_memo2, create_by, create_time, update_by, update_time from tt_device dev
     </sql>
 
@@ -36,7 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>
             <if test="mechId != null "> and mech_id = #{mechId}</if>
             <if test="mechOwn != null "> and mech_own = #{mechOwn}</if>
-            <if test="deviveName != null  and deviveName != ''"> and devive_name like concat('%', #{deviveName}, '%')</if>
+            <if test="deviceName != null  and deviceName != ''"> and device_name like concat('%', #{deviceName}, '%')</if>
             <if test="deviceNo != null  and deviceNo != ''"> and device_no = #{deviceNo}</if>
             <if test="deviceStatus != null  and deviceStatus != ''"> and device_status = #{deviceStatus}</if>
             <if test="deviceStartTime != null "> and device_start_time = #{deviceStartTime}</if>

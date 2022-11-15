@@ -10,8 +10,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "ruoyi")
-public class RuoYiConfig
-{
+public class RuoYiConfig{
     /** 项目名称 */
     private static String name;
 
@@ -29,6 +28,16 @@ public class RuoYiConfig
 
     /** 获取地址开关 */
     private static boolean addressEnabled;
+
+    private static Integer ttPort;
+
+    public static Integer getTtPort() {
+        return ttPort;
+    }
+
+    public static void setTtPort(Integer ttPort) {
+        RuoYiConfig.ttPort = ttPort;
+    }
 
     public static String getName()
     {

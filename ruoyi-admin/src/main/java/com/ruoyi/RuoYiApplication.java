@@ -1,5 +1,7 @@
 package com.ruoyi;
 
+import com.ruoyi.common.config.RuoYiConfig;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.tt.service.SocketServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -15,9 +17,13 @@ import io.netty.handler.codec.string.StringEncoder;
 import io.netty.util.CharsetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 /**
  * 启动程序
@@ -26,6 +32,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  */
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 public class RuoYiApplication{
+
     private static final Logger log = LoggerFactory.getLogger(RuoYiApplication.class);
     public static void main(String[] args)  {
 
@@ -47,8 +54,9 @@ public class RuoYiApplication{
                                     .addLast("socketServerHandler",new SocketServerHandler());
                         }
                     });
-            ChannelFuture future = bootstrap.bind(8888).sync();
-            log.info("{},后台通信服务已在端口 {} 启动", RuoYiApplication.class.getSimpleName(),8888);
+            int ttPort = Integer.parseInt(SpringUtils.getRequiredProperty("ruoyi.ttPort"));
+            ChannelFuture future = bootstrap.bind(ttPort).sync();
+            log.info("{},后台通信服务已在端口 {} 启动", RuoYiApplication.class.getSimpleName(),ttPort);
             future.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();

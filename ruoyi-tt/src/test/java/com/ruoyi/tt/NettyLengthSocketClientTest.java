@@ -14,8 +14,8 @@ import java.nio.ByteBuffer;
 public class NettyLengthSocketClientTest {
 
     public static void main(String[] args) {
-        String host = "127.0.0.1";
-        int port = 8888;
+        String host = "139.198.40.36";
+        int port = 8011;
         try {
             Socket socket = new Socket();
             socket.connect(new InetSocketAddress(host, port));
