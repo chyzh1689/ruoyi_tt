@@ -1,5 +1,7 @@
 package com.ruoyi.tt;
 
+import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.tt.third.TTSocketDto;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -14,7 +16,7 @@ import java.nio.ByteBuffer;
 public class NettyLengthSocketClientTest {
 
     public static void main(String[] args) {
-        String host = "139.198.40.36";
+        String host = "localhost";
         int port = 8011;
         try {
             Socket socket = new Socket();
@@ -24,7 +26,9 @@ public class NettyLengthSocketClientTest {
             InputStream in = socket.getInputStream();
             // 客户端发送消息
             ByteBuffer header = ByteBuffer.allocate(4);
-            String msg = "我是客户端！";
+            TTSocketDto ttSocketDto = new TTSocketDto();
+            ttSocketDto.setAction("action");
+            String msg = JSONObject.toJSONString(ttSocketDto);
             byte[] msgBytes = msg.getBytes();
             header.putInt(msgBytes.length);
             out.write(header.array());

@@ -2,10 +2,8 @@ package com.ruoyi.tt.controller;
 
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.tt.domain.Device;
 import com.ruoyi.tt.service.IDeviceService;
-import com.ruoyi.tt.service.IMechantService;
-import com.ruoyi.tt.service.SocketServerHandler;
+import com.ruoyi.tt.third.SocketServerHandler;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,8 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.List;
 
 /**
  * 通讯记录信息Controller

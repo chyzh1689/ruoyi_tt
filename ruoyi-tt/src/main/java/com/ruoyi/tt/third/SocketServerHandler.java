@@ -1,6 +1,10 @@
-package com.ruoyi.tt.service;
+package com.ruoyi.tt.third;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.common.utils.spring.SpringUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -11,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.SocketAddress;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -36,8 +39,9 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
         if(msgs.size()>30){
             msgs.remove(msgs.size()-1);
         }
-        ctx.channel().writeAndFlush("from socketServer,"+ msg);
-
+        TtSocketService ttSocketService = SpringUtils.getBean(TtSocketService.class);
+        R r = ttSocketService.handle(msg);
+        ctx.channel().writeAndFlush(JSONObject.toJSONString(r));
     }
 
     @Override
