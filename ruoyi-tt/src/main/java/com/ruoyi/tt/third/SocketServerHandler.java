@@ -1,5 +1,6 @@
 package com.ruoyi.tt.third;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.DateUtils;
@@ -52,8 +53,17 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
             msgs.remove(msgs.size() - 1);
         }
         TtSocketService ttSocketService = SpringUtils.getBean(TtSocketService.class);
-        R r = ttSocketService.handle(msg, channel.id().toString());
-        ctx.channel().writeAndFlush(JSONObject.toJSONString(r));
+        if(msg instanceof String){
+            TTSocketDto ttSocketDto = JSON.parseObject((String) msg, TTSocketDto.class);
+            ttSocketDto.setChannelId(channel.id().toString());
+            R r = ttSocketService.handle(ttSocketDto);
+            r.setAction(ttSocketDto.getAction());
+            ctx.channel().writeAndFlush(JSONObject.toJSONString(r));
+        }else{
+            ctx.channel().writeAndFlush(JSONObject.toJSONString(R.ok()));
+        }
+
+
     }
 
     @Override
@@ -71,8 +81,8 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
         SocketAddress address = channel.remoteAddress();
         log.info("{},-----下线", address);
         channelMap.remove(channel.id().toString());
-        //String deviceNo = channelToDevice.remove(channel.id().toString());
-        //deviceToChannel.remove(deviceNo);
+        String deviceNo = channelToDevice.remove(channel.id().toString());
+        deviceToChannel.remove(deviceNo);
     }
 
     @Override

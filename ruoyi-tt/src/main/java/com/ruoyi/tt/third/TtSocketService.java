@@ -1,6 +1,5 @@
 package com.ruoyi.tt.third;
 
-import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -13,31 +12,29 @@ import com.ruoyi.tt.enums.YesOrNoStatus;
 import com.ruoyi.tt.mapper.AccountMapper;
 import com.ruoyi.tt.mapper.DeviceMapper;
 import com.ruoyi.tt.mapper.MechantMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 public class TtSocketService {
     /**处理消息**/
-    R handle(Object msg,String channelId){
-        if(msg instanceof String){
-            TTSocketDto ttSocketDto = JSON.parseObject((String) msg, TTSocketDto.class);
-            ttSocketDto.setChannelId(channelId);
-            String action = ttSocketDto.getAction();
-            String packageName = ttSocketDto.getPackageName();
-            if(TTScoketConstants.PACKAGE_NAME_ADMIN.equals(packageName)){
-                switch (action){
-                    //设备初始化
-                    case TTScoketConstants.ACTION_CLIENT_INIT: return this.actionClientInit(ttSocketDto);
-                    case TTScoketConstants.ACTION_CLIENT_DISCONNECT: return this.actionClientDisconnect(ttSocketDto);
-                    case TTScoketConstants.ACTION_CLIENT_MESSAGE: return this.actionClientMessage(ttSocketDto);
-                    default:
-                }
-            }else if(TTScoketConstants.PACKAGE_NAME_TT.equals(packageName)){
-                ttSocketDto.setChannelPackage(ChannelPackage.TT.name());
-                return this.accountLogin(ttSocketDto);
+    R handle(TTSocketDto ttSocketDto){
+        String action = ttSocketDto.getAction();
+        String packageName = ttSocketDto.getPackageName();
+        if(TTScoketConstants.PACKAGE_NAME_ADMIN.equals(packageName)){
+            switch (action){
+                //设备初始化
+                case TTScoketConstants.ACTION_CLIENT_INIT: return this.actionClientInit(ttSocketDto);
+                case TTScoketConstants.ACTION_CLIENT_DISCONNECT: return this.actionClientDisconnect(ttSocketDto);
+                case TTScoketConstants.ACTION_CLIENT_MESSAGE: return this.actionClientMessage(ttSocketDto);
+                default:
             }
+        }else if(TTScoketConstants.PACKAGE_NAME_TT.equals(packageName)){
+            ttSocketDto.setChannelPackage(ChannelPackage.TT.name());
+            return this.accountLogin(ttSocketDto);
         }
         return R.ok();
     }
@@ -65,8 +62,11 @@ public class TtSocketService {
     }
 
     private R methodAppConfig(TTSocketDto ttSocketDto) {
-
-        return R.ok();
+        TTSocketResp resp = new TTSocketResp();
+        resp.setAction(ttSocketDto.getMessage().getMethod());
+        resp.setUserInfo(ttSocketDto.getUserInfo());
+        resp.setMessage(ttSocketDto.getMessage());
+        return R.ok(resp,"操作成功！");
     }
 
     @Autowired

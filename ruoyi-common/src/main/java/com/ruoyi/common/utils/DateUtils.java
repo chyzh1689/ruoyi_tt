@@ -178,8 +178,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
     /**
      * 增加 LocalDate ==> Date
      */
-    public static Date toDate(LocalDate temporalAccessor)
-    {
+    public static Date toDate(LocalDate temporalAccessor) {
         LocalDateTime localDateTime = LocalDateTime.of(temporalAccessor, LocalTime.of(0, 0, 0));
         ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
         return Date.from(zdt.toInstant());
@@ -187,9 +186,6 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
 
     public static boolean ifNowBetween(Date deviceStartTime, Date deviceEndTime) {
         long now = System.currentTimeMillis();
-        System.out.println("now:"+now);
-        System.out.println("deviceStartTime:"+deviceStartTime.getTime());
-        System.out.println("deviceEndTime:"+deviceEndTime.getTime());
         return now>=deviceStartTime.getTime() && now<=deviceEndTime.getTime()+1000*24*60*60;
     }
 }

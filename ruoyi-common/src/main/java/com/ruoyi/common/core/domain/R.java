@@ -30,6 +30,16 @@ public class R<T> implements Serializable{
 
     private long tcpTime;
 
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    private String action;
+
     private T data;
 
     public static <T> R<T> ok()
