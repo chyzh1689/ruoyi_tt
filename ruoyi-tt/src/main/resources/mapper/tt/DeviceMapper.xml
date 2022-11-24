@@ -50,13 +50,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectDeviceVo"/>
         where device_id = #{deviceId}
     </select>
+    <select id="selectDeviceByDeviceNo" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        where device_no = #{deviceNo}
+    </select>
 
     <insert id="insertDevice" parameterType="Device" useGeneratedKeys="true" keyProperty="deviceId">
         insert into tt_device
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="mechId != null">mech_id,</if>
             <if test="mechOwn != null">mech_own,</if>
-            <if test="deviveName != null">devive_name,</if>
+            <if test="deviceName != null">device_name,</if>
             <if test="deviceNo != null">device_no,</if>
             <if test="deviceStatus != null">device_status,</if>
             <if test="deviceStartTime != null">device_start_time,</if>
@@ -71,7 +75,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="mechId != null">#{mechId},</if>
             <if test="mechOwn != null">#{mechOwn},</if>
-            <if test="deviveName != null">#{deviveName},</if>
+            <if test="deviceName != null">#{deviceName},</if>
             <if test="deviceNo != null">#{deviceNo},</if>
             <if test="deviceStatus != null">#{deviceStatus},</if>
             <if test="deviceStartTime != null">#{deviceStartTime},</if>
@@ -90,7 +94,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="SET" suffixOverrides=",">
             <if test="mechId != null">mech_id = #{mechId},</if>
             <if test="mechOwn != null">mech_own = #{mechOwn},</if>
-            <if test="deviveName != null">devive_name = #{deviveName},</if>
+            <if test="deviceName != null">device_name = #{deviceName},</if>
             <if test="deviceNo != null">device_no = #{deviceNo},</if>
             <if test="deviceStatus != null">device_status = #{deviceStatus},</if>
             <if test="deviceStartTime != null">device_start_time = #{deviceStartTime},</if>

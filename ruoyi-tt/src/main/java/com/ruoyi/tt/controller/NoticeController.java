@@ -23,7 +23,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
  * 关注信息Controller
  * 
  * @author xxxxxx
- * @date 2022-10-22
+ * @date 2022-11-22
  */
 @Controller
 @RequestMapping("/tt/notice")
@@ -93,10 +93,10 @@ public class NoticeController extends BaseController
      * 修改关注信息
      */
     @RequiresPermissions("tt:notice:edit")
-    @GetMapping("/edit/{accountId}")
-    public String edit(@PathVariable("accountId") Long accountId, ModelMap mmap)
+    @GetMapping("/edit/{noticeNo}")
+    public String edit(@PathVariable("noticeNo") String noticeNo, ModelMap mmap)
     {
-        Notice notice = noticeService.selectNoticeByAccountId(accountId);
+        Notice notice = noticeService.selectNoticeByNoticeNo(noticeNo);
         mmap.put("notice", notice);
         return prefix + "/edit";
     }
@@ -122,6 +122,6 @@ public class NoticeController extends BaseController
     @ResponseBody
     public AjaxResult remove(String ids)
     {
-        return toAjax(noticeService.deleteNoticeByAccountIds(ids));
+        return toAjax(noticeService.deleteNoticeByNoticeNos(ids));
     }
 }

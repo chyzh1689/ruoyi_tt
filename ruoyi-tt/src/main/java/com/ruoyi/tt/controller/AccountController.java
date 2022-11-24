@@ -27,8 +27,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
  */
 @Controller
 @RequestMapping("/tt/account")
-public class AccountController extends BaseController
-{
+public class AccountController extends BaseController{
     private String prefix = "tt/account";
 
     @Autowired

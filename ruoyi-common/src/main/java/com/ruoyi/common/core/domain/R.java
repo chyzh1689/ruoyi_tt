@@ -7,8 +7,7 @@ import java.io.Serializable;
  *
  * @author ruoyi
  */
-public class R<T> implements Serializable
-{
+public class R<T> implements Serializable{
     private static final long serialVersionUID = 1L;
 
     /** 成功 */
@@ -20,6 +19,16 @@ public class R<T> implements Serializable
     private int code;
 
     private String msg;
+
+    public long getTcpTime() {
+        return tcpTime;
+    }
+
+    public void setTcpTime(long tcpTime) {
+        this.tcpTime = tcpTime;
+    }
+
+    private long tcpTime;
 
     private T data;
 
@@ -66,6 +75,7 @@ public class R<T> implements Serializable
     private static <T> R<T> restResult(T data, int code, String msg)
     {
         R<T> apiResult = new R<>();
+        apiResult.setTcpTime(System.currentTimeMillis());
         apiResult.setCode(code);
         apiResult.setData(data);
         apiResult.setMsg(msg);

@@ -184,4 +184,12 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
         return Date.from(zdt.toInstant());
     }
+
+    public static boolean ifNowBetween(Date deviceStartTime, Date deviceEndTime) {
+        long now = System.currentTimeMillis();
+        System.out.println("now:"+now);
+        System.out.println("deviceStartTime:"+deviceStartTime.getTime());
+        System.out.println("deviceEndTime:"+deviceEndTime.getTime());
+        return now>=deviceStartTime.getTime() && now<=deviceEndTime.getTime()+1000*24*60*60;
+    }
 }

@@ -7,6 +7,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap type="Notice" id="NoticeResult">
         <result property="noticeNo"    column="notice_no"    />
         <result property="mechantId"    column="mechant_id"    />
+        <result property="mechShow"  column="mech_show"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceShow"    column="device_show"    />
         <result property="channelPackage"    column="channel_package"    />
         <result property="noticeName"    column="notice_name"    />
         <result property="noticeImgRul"    column="notice_img_rul"    />
@@ -15,7 +18,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="ownNo"    column="own_no"    />
         <result property="ownName"    column="own_name"    />
         <result property="ownImgUrl"    column="own_img_url"    />
-        <result property="deviceId"    column="device_id"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
@@ -23,7 +25,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <sql id="selectNoticeVo">
-        select notice_no, mechant_id, channel_package, notice_name, notice_img_rul, notice_location, notice_flag, own_no, own_name, own_img_url, device_id, create_by, create_time, update_by, update_time from tt_notice
+        select notice_no,channel_package,
+               mechant_id,(select mech.mech_name from tt_mechant  mech where mech.mech_id = noti.mechant_id) mech_show,
+               device_id, (select devi.device_name from tt_device  devi where devi.device_id = noti.device_id) device_show,
+               mechant_id,
+               device_id,
+               notice_name, notice_img_rul, notice_location, notice_flag, own_no, own_name, own_img_url,  create_by, create_time, update_by, update_time from tt_notice noti
     </sql>
 
     <select id="selectNoticeList" parameterType="Notice" resultMap="NoticeResult">

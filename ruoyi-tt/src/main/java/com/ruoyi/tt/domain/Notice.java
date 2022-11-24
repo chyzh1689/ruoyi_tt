@@ -10,7 +10,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 关注信息对象 tt_notice
  * 
  * @author xxxxxx
- * @date 2022-11-08
+ * @date 2022-11-22
  */
 @Data
 public class Notice extends BaseEntity{
@@ -56,5 +56,9 @@ public class Notice extends BaseEntity{
     /** 设备id */
     @Excel(name = "设备id")
     private Long deviceId;
+
+    private String deviceShow;
+
+    private String mechShow;
 
 }

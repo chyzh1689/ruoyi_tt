@@ -7,17 +7,17 @@ import com.ruoyi.tt.domain.Notice;
  * 关注信息Service接口
  * 
  * @author xxxxxx
- * @date 2022-10-22
+ * @date 2022-11-22
  */
 public interface INoticeService 
 {
     /**
      * 查询关注信息
      * 
-     * @param accountId 关注信息主键
+     * @param noticeNo 关注信息主键
      * @return 关注信息
      */
-    public Notice selectNoticeByAccountId(Long accountId);
+    public Notice selectNoticeByNoticeNo(String noticeNo);
 
     /**
      * 查询关注信息列表
@@ -46,16 +46,16 @@ public interface INoticeService
     /**
      * 批量删除关注信息
      * 
-     * @param accountIds 需要删除的关注信息主键集合
+     * @param noticeNos 需要删除的关注信息主键集合
      * @return 结果
      */
-    public int deleteNoticeByAccountIds(String accountIds);
+    public int deleteNoticeByNoticeNos(String noticeNos);
 
     /**
      * 删除关注信息信息
      * 
-     * @param accountId 关注信息主键
+     * @param noticeNo 关注信息主键
      * @return 结果
      */
-    public int deleteNoticeByAccountId(Long accountId);
+    public int deleteNoticeByNoticeNo(String noticeNo);
 }

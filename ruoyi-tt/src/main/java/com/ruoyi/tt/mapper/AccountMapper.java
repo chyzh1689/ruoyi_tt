@@ -58,4 +58,12 @@ public interface AccountMapper
      * @return 结果
      */
     public int deleteAccountByAccountIds(String[] accountIds);
+
+    /**
+     * 账号信息为空
+     * @param account
+     * @return
+     */
+    public Account selectAccount(Account account);
+
 }

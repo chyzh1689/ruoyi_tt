@@ -1,7 +1,11 @@
 package com.ruoyi.tt.third;
 
 public class TTScoketConstants {
+    /***设备登录***/
     public static final String PACKAGE_NAME_ADMIN = "admin";
+    /***推特账号 登录***/
+    public static final String PACKAGE_NAME_TT ="com.twitter.android";
+
 
     public static final String ACTION_CLIENT_INIT = "client-init";
     public static final String ACTION_CLIENT_SYNC = "client-sync";

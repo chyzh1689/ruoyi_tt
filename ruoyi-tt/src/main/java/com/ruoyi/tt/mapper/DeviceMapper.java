@@ -9,8 +9,7 @@ import com.ruoyi.tt.domain.Device;
  * @author xxxxxx
  * @date 2022-10-22
  */
-public interface DeviceMapper 
-{
+public interface DeviceMapper {
     /**
      * 查询设备信息
      * 
@@ -18,6 +17,9 @@ public interface DeviceMapper
      * @return 设备信息
      */
     public Device selectDeviceByDeviceId(Long deviceId);
+
+    public Device selectDeviceByDeviceNo(String deviceNo);
+
 
     /**
      * 查询设备信息列表
@@ -58,4 +60,5 @@ public interface DeviceMapper
      * @return 结果
      */
     public int deleteDeviceByDeviceIds(String[] deviceIds);
+
 }
