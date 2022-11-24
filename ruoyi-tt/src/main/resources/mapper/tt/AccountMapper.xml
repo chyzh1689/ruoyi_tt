@@ -49,12 +49,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectAccountVo"/>
         where account_id = #{accountId}
     </select>
-    <select id="selectAccount" parameterType="Account">
+    <select id="selectAccount" parameterType="Account" resultMap="AccountResult">
         <include refid="selectAccountVo"/>
         where
           account_no = #{accountNo}
-          mechant_id = #{mechantId}
-          account_channel = #{accountChannel}
+          and mechant_id = #{mechantId}
+          and account_channel = #{accountChannel}
     </select>
 
     <insert id="insertAccount" parameterType="Account">

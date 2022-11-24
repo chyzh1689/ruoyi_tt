@@ -17,8 +17,8 @@ import java.nio.ByteBuffer;
 
 @Slf4j
 public class TTSocketTest {
-    String host = "localhost";
-//    String host = "139.198.40.36";
+//    String host = "localhost";
+    String host = "139.198.40.36";
     int port = 8011;
 
     /***

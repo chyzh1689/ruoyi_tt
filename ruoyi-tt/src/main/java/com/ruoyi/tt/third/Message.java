@@ -11,4 +11,5 @@ public class Message {
     private String location;
     private String userId;
     private String userName;
+    private String method;
 }

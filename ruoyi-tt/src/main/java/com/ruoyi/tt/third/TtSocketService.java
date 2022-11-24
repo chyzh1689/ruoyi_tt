@@ -15,6 +15,7 @@ import com.ruoyi.tt.mapper.DeviceMapper;
 import com.ruoyi.tt.mapper.MechantMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TtSocketService {
@@ -30,6 +31,7 @@ public class TtSocketService {
                     //设备初始化
                     case TTScoketConstants.ACTION_CLIENT_INIT: return this.actionClientInit(ttSocketDto);
                     case TTScoketConstants.ACTION_CLIENT_DISCONNECT: return this.actionClientDisconnect(ttSocketDto);
+                    case TTScoketConstants.ACTION_CLIENT_MESSAGE: return this.actionClientMessage(ttSocketDto);
                     default:
                 }
             }else if(TTScoketConstants.PACKAGE_NAME_TT.equals(packageName)){
@@ -40,6 +42,33 @@ public class TtSocketService {
         return R.ok();
     }
 
+    /**
+     * 消息处理
+     * @param ttSocketDto
+     * @return
+     */
+    private R actionClientMessage(TTSocketDto ttSocketDto) {
+        Message message = ttSocketDto.getMessage();
+        if(message==null){
+            return R.fail("消息处理对象为空！");
+        }
+        String method = message.getMethod();
+        if(StringUtils.isEmpty(method)){
+            return R.fail("要处理的消息为空！");
+        }
+        switch (method){
+            //设备初始化
+            case TTScoketConstants.METHOD_APP_CONFIG: return this.methodAppConfig(ttSocketDto);
+            default:
+        }
+        return R.ok();
+    }
+
+    private R methodAppConfig(TTSocketDto ttSocketDto) {
+
+        return R.ok();
+    }
+
     @Autowired
     private AccountMapper accountMapper;
     /**
@@ -47,7 +76,8 @@ public class TtSocketService {
      * @param ttSocketDto
      * @return
      */
-    private R accountLogin(TTSocketDto ttSocketDto) {
+    @Transactional(rollbackFor = Exception.class)
+    public R accountLogin(TTSocketDto ttSocketDto) {
         UserInfo userInfo = ttSocketDto.getUserInfo();
         if(userInfo ==null){
             return R.fail("账号信息为空!");

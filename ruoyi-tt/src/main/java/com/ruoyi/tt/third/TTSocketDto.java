@@ -13,6 +13,6 @@ public class TTSocketDto {
     private String packageName;
     private String action;
     private UserInfo userInfo;
-    private String message;
+    private Message message;
     private String channelPackage;
 }

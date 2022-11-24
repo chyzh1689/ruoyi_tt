@@ -30,7 +30,6 @@ public class RuoYiApplication{
 
     private static final Logger log = LoggerFactory.getLogger(RuoYiApplication.class);
     public static void main(String[] args)  {
-
         SpringApplication.run(RuoYiApplication.class, args);
         log.info("后台管理服务启动成功！");
         EventLoopGroup parent = new NioEventLoopGroup();
