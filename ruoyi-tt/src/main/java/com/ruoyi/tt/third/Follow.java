@@ -4,6 +4,9 @@ import lombok.Data;
 
 @Data
 public class Follow {
+    private Integer sex;
+    private Integer minAge;
+    private Integer maxAge;
     private Integer number;
     private Long minSpeed;
     private Long maxSpeed;

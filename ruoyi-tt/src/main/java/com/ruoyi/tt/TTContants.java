@@ -12,6 +12,9 @@ public class TTContants {
     public static final String CACHE_KEY_TT_FOLLOW_NICKNAME = "tt.follow.match.nickname";
     public static final String CACHE_KEY_TT_FOLLOW_SIGNATURE = "tt.follow.match.signature";
     public static final String CACHE_KEY_TT_FOLLOW_COMMENT = "tt.follow.match.comment";
+    public static final String CACHE_KEY_TT_FOLLOW_SEX = "tt.follow.sex";
+    public static final String CACHE_KEY_TT_FOLLOW_MINAGE = "tt.follow.minAge";
+    public static final String CACHE_KEY_TT_FOLLOW_MAXAGE = "tt.follow.maxAge";
 
 
 }
