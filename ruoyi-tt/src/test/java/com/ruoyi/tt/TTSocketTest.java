@@ -17,10 +17,24 @@ import java.nio.ByteBuffer;
 
 @Slf4j
 public class TTSocketTest {
-//    String host = "localhost";
-    String host = "139.198.40.36";
+    String host = "localhost";
+//    String host = "139.198.40.36";
     int port = 8011;
+    /***
+     * 获取配置信息
+     */
+    @Test
+    public void appConfig(){
+        //设备登录
+        TTSocketDto ttSocketDto = new TTSocketDto();
+        ttSocketDto.setAction(TTScoketConstants.ACTION_APP_CONFIG);
+        ttSocketDto.setPackageName(TTScoketConstants.PACKAGE_NAME_ADMIN);
+        ttSocketDto.setUserInfo(new UserInfo());
+        ttSocketDto.setAndroidId("24242");
+        this.commonSend(ttSocketDto);
+        //账号登录
 
+    }
     /***
      * 设备登录
      */
@@ -28,7 +42,7 @@ public class TTSocketTest {
     public void deviceLogin(){
         //设备登录
         TTSocketDto ttSocketDto = new TTSocketDto();
-        ttSocketDto.setAction(TTScoketConstants.ACTION_CLIENT_INIT);
+        ttSocketDto.setAction(TTScoketConstants.ACTION_DEVICE_LOGIN);
         ttSocketDto.setPackageName(TTScoketConstants.PACKAGE_NAME_ADMIN);
         ttSocketDto.setAndroidId("24242");
         this.commonSend(ttSocketDto);
@@ -42,7 +56,7 @@ public class TTSocketTest {
     @Test
     public void accountLogin(){
         TTSocketDto ttSocketDto = new TTSocketDto();
-        ttSocketDto.setAction(TTScoketConstants.ACTION_CLIENT_INIT);
+        ttSocketDto.setAction(TTScoketConstants.ACTION_ACCOUNT_LOGIN);
         ttSocketDto.setPackageName(TTScoketConstants.PACKAGE_NAME_TT);
         ttSocketDto.setAndroidId("24242");
         UserInfo userInfo = new UserInfo();

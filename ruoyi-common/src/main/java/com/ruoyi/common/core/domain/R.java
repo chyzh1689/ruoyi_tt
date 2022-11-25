@@ -20,19 +20,6 @@ public class R<T> implements Serializable{
 
     private String msg;
 
-    public long getTcpTime() {
-        return tcpTime;
-    }
-
-    public void setTcpTime(long tcpTime) {
-        this.tcpTime = tcpTime;
-    }
-
-    private long tcpTime;
-
-    public String getAction() {
-        return action;
-    }
 
     public void setAction(String action) {
         this.action = action;
@@ -85,7 +72,6 @@ public class R<T> implements Serializable{
     private static <T> R<T> restResult(T data, int code, String msg)
     {
         R<T> apiResult = new R<>();
-        apiResult.setTcpTime(System.currentTimeMillis());
         apiResult.setCode(code);
         apiResult.setData(data);
         apiResult.setMsg(msg);

@@ -1,8 +1,12 @@
 package com.ruoyi.tt.third;
 
-import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.constant.RedisConstants;
+import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.common.utils.CacheUtils;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
+import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.tt.TTContants;
 import com.ruoyi.tt.domain.Account;
 import com.ruoyi.tt.domain.Device;
 import com.ruoyi.tt.domain.Mechant;
@@ -20,54 +24,65 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 public class TtSocketService {
+    @Autowired
+    private RedisCache redisCache;
     /**处理消息**/
-    R handle(TTSocketDto ttSocketDto){
+    TTSocketDto handle(TTSocketDto ttSocketDto){
         String action = ttSocketDto.getAction();
-        String packageName = ttSocketDto.getPackageName();
-        if(TTScoketConstants.PACKAGE_NAME_ADMIN.equals(packageName)){
-            switch (action){
-                //设备初始化
-                case TTScoketConstants.ACTION_CLIENT_INIT: return this.actionClientInit(ttSocketDto);
-                case TTScoketConstants.ACTION_CLIENT_DISCONNECT: return this.actionClientDisconnect(ttSocketDto);
-                case TTScoketConstants.ACTION_CLIENT_MESSAGE: return this.actionClientMessage(ttSocketDto);
-                default:
-            }
-        }else if(TTScoketConstants.PACKAGE_NAME_TT.equals(packageName)){
-            ttSocketDto.setChannelPackage(ChannelPackage.TT.name());
-            return this.accountLogin(ttSocketDto);
+        switch (action){
+            //设备初始化
+            case TTScoketConstants.ACTION_DEVICE_LOGIN: return this.actionDeviceLogin(ttSocketDto);
+            //断开连接
+            case TTScoketConstants.ACTION_ACCOUNT_DISCONNECT: return this.actionAccountDisconnect(ttSocketDto);
+            //账号登录
+            case TTScoketConstants.ACTION_ACCOUNT_LOGIN: return this.accountLogin(ttSocketDto);
+            //获取配置
+            case TTScoketConstants.ACTION_APP_CONFIG: return this.appConfig(ttSocketDto);
+            //是否关注
+            case TTScoketConstants.ACTION_FOLLOW: return this.appConfig(ttSocketDto);
+            //关注列表
+            case TTScoketConstants.ACTION_follow_list: return this.appConfig(ttSocketDto);
+            //聊天消息
+            case TTScoketConstants.ACTION_CHAT_MSG: return this.appConfig(ttSocketDto);
+            //聊天指令
+            case TTScoketConstants.ACTION_CHAT_CMD: return this.appConfig(ttSocketDto);
+            //同步心跳
+            case TTScoketConstants.ACTION_SYNC: return this.appConfig(ttSocketDto);
+            //操作指令
+            case TTScoketConstants.ACTION_CMD: return this.appConfig(ttSocketDto);
+            //获取粉丝列表
+            case TTScoketConstants.ACTION_USER_LIST: return this.appConfig(ttSocketDto);
+            default:
         }
-        return R.ok();
+        return ttSocketDto;
     }
 
+    @Autowired
+    private ISysConfigService configService;
     /**
-     * 消息处理
+     * 配置信息
      * @param ttSocketDto
      * @return
      */
-    private R actionClientMessage(TTSocketDto ttSocketDto) {
-        Message message = ttSocketDto.getMessage();
-        if(message==null){
-            return R.fail("消息处理对象为空！");
+    private TTSocketDto appConfig(TTSocketDto ttSocketDto) {
+        UserInfo userInfo = ttSocketDto.getUserInfo();
+        if(userInfo==null){
+            return ttSocketDto.fail("用户信息为空！");
         }
-        String method = message.getMethod();
-        if(StringUtils.isEmpty(method)){
-            return R.fail("要处理的消息为空！");
-        }
-        switch (method){
-            //设备初始化
-            case TTScoketConstants.METHOD_APP_CONFIG: return this.methodAppConfig(ttSocketDto);
-            default:
-        }
-        return R.ok();
+        Follow follow = new Follow();
+        follow.setNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NUMBER)));
+        follow.setMinSpeed(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINSPEED)));
+        follow.setMaxSpeed(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXSPEED)));
+        follow.setSleepTime(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SLEEPTIME)));
+        follow.setSleepCount(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SLEEPCOUNT)));
+        Match match = new Match();
+        follow.setMatch(match);
+        match.setNickname(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NICKNAME));
+        match.setSignature(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NICKNAME));
+        match.setComment(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_COMMENT));
+        return ttSocketDto.ok(follow,"获取配置信息成功！");
     }
 
-    private R methodAppConfig(TTSocketDto ttSocketDto) {
-        TTSocketResp resp = new TTSocketResp();
-        resp.setAction(ttSocketDto.getMessage().getMethod());
-        resp.setUserInfo(ttSocketDto.getUserInfo());
-        resp.setMessage(ttSocketDto.getMessage());
-        return R.ok(resp,"操作成功！");
-    }
 
     @Autowired
     private AccountMapper accountMapper;
@@ -77,35 +92,35 @@ public class TtSocketService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public R accountLogin(TTSocketDto ttSocketDto) {
+    public TTSocketDto accountLogin(TTSocketDto ttSocketDto) {
         UserInfo userInfo = ttSocketDto.getUserInfo();
         if(userInfo ==null){
-            return R.fail("账号信息为空!");
+            return ttSocketDto.fail("账号信息为空!");
         }
         if(StringUtils.isEmpty(userInfo.getUserName()) || StringUtils.isEmpty(userInfo.getUserId())){
-            return R.fail("账号昵称为空");
+            return ttSocketDto.fail("账号昵称为空");
         }
         Account account = new Account();
-        String deviceNo = SocketServerHandler.getChannelToDevice().get(ttSocketDto.getChannelId());
+        String deviceNo = redisCache.getCacheMapValue(RedisConstants.TT_CHANNEL_DEVICE,ttSocketDto.getChannelId());
         Device device = deviceMapper.selectDeviceByDeviceNo(deviceNo);
         if(device==null){
             if(device==null){
-                return R.fail("设备不存在！");
+                return ttSocketDto.fail("设备不存在！");
             }
         }
 
         Mechant mechant = mechantMapper.selectMechantByMechId(device.getMechId());
         if(mechant==null){
-            return R.fail("商户不存在！");
+            return ttSocketDto.fail("商户不存在！");
         }
         if(YesOrNoStatus.NO.equals(mechant.getMechStatus())){
-            return R.fail("商户被禁用！");
+            return ttSocketDto.fail("商户被禁用！");
         }
-        if(!ChannelPackage.hasChannel(mechant.getMechChannel(),ttSocketDto.getChannelPackage())){
-            return R.fail("当前商户未开通相关渠道！");
+        if(!ChannelPackage.hasChannel(mechant.getMechChannel(),ttSocketDto.getPackageName())){
+            return ttSocketDto.fail("当前商户未开通相关渠道！");
         }
         account.setMechantId(device.getMechId());
-        account.setAccountChannel(ttSocketDto.getChannelPackage());
+        account.setAccountChannel(ttSocketDto.getPackageName());
         account.setAccountNo(userInfo.getUserId());
         Account dataAccount = accountMapper.selectAccount(account);
         if(dataAccount==null){
@@ -121,7 +136,7 @@ public class TtSocketService {
             account.setAccountStatus(AccountStatus.LOGIN.val());
             accountMapper.updateAccount(dataAccount);
         }
-        return R.ok();
+        return ttSocketDto.ok();
     }
 
     @Autowired
@@ -133,43 +148,46 @@ public class TtSocketService {
      * @param ttSocketDto
      * @return
      */
-    private R actionClientInit(TTSocketDto ttSocketDto) {
+    private TTSocketDto actionDeviceLogin(TTSocketDto ttSocketDto) {
         String deviceNo = ttSocketDto.getAndroidId();
         if(deviceNo==null){
-            return R.fail("设备编码为空!");
+            return ttSocketDto.fail("设备编码为空！");
         }
         Device device = deviceMapper.selectDeviceByDeviceNo(deviceNo);
         if(device==null){
-            return R.fail("设备不存在！");
+            return ttSocketDto.fail("设备不存在！");
         }
         if(YesOrNoStatus.NO.equals(device.getDeviceStatus())){
-            return R.fail("设备已被禁用！");
+            ttSocketDto.setMsg("设备编码为空!");
+            return ttSocketDto.fail("设备已被禁用！");
         }
         if(!DateUtils.ifNowBetween(device.getDeviceStartTime(),device.getDeviceEndTime())){
-            return R.fail("设备到期或未激活！");
+            ttSocketDto.setMsg("设备编码为空!");
+            return ttSocketDto.fail("设备到期或未激活！");
         }
         Mechant mechant = mechantMapper.selectMechantByMechId(device.getMechId());
         if(mechant==null){
-            return R.fail("商户不存在！");
+            ttSocketDto.setMsg("设备编码为空!");
+            return ttSocketDto.fail("商户不存在！");
         }
         if(YesOrNoStatus.NO.equals(mechant.getMechStatus())){
-            return R.fail("商户被禁用！");
+            ttSocketDto.setMsg("设备编码为空!");
+            return ttSocketDto.fail("商户被禁用！");
         }
 //        if(mechant.getMechChannel()==0){
 //            return R.fail("当前商户未开通相关渠道！");
 //        }
-        SocketServerHandler.getDeviceToChannel().put(ttSocketDto.getAndroidId(),ttSocketDto.getChannelId());
-        SocketServerHandler.getChannelToDevice().put(ttSocketDto.getChannelId(),ttSocketDto.getAndroidId());
-        return R.ok(ttSocketDto.getChannelId(),"设备连接成功！");
+        redisCache.setCacheMapValue(RedisConstants.TT_CHANNEL_DEVICE,ttSocketDto.getChannelId(),ttSocketDto.getAndroidId());
+        redisCache.setCacheMapValue(RedisConstants.TT_DEVICE_CHANNEL,ttSocketDto.getAndroidId(),ttSocketDto.getChannelId());
+        return ttSocketDto.ok(ttSocketDto.getChannelId(),"设备连接成功！");
     }
     /**
      * 设备断开连接
      * @param ttSocketDto
      * @return
      */
-    private R actionClientDisconnect(TTSocketDto ttSocketDto) {
-
-        return R.ok();
+    private TTSocketDto actionAccountDisconnect(TTSocketDto ttSocketDto) {
+        return ttSocketDto.ok();
     }
 
 

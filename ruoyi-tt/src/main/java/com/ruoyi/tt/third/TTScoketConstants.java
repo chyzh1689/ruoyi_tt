@@ -1,22 +1,43 @@
 package com.ruoyi.tt.third;
 
+import com.ruoyi.tt.enums.ChannelPackage;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class TTScoketConstants {
     /***设备登录***/
     public static final String PACKAGE_NAME_ADMIN = "admin";
     /***推特账号 登录***/
     public static final String PACKAGE_NAME_TT ="com.twitter.android";
+    public static final String PACKAGE_NAME_FB ="com.facebook.android";
 
 
-    public static final String ACTION_CLIENT_INIT = "client-init";
-    public static final String ACTION_CLIENT_SYNC = "client-sync";
-    public static final String ACTION_CLIENT_DISCONNECT = "client-disconnect";
-    public static final String ACTION_CLIENT_MESSAGE = "client-message";
+    public static Map<String, String> getChannelMap() {
+        return channelMap;
+    }
 
-    public static final String METHOD_APP_CONFIG = "app-config";
-    public static final String METHOD_APP_MESSAGE = "app-message";
-    public static final String METHOD_RUN_ERROR = "run-error";
-    public static final String METHOD_FOLLOW_SUCCESS = "follow-success";
-    public static final String METHOD_FOLLOW_FAILURE="follow-failure";
-    public static final String METHOD_FOLLOW_LIST="follow-list";
-    public static final String METHOD_FOLLOW_BACK="follow-back";
+    private static final Map<String,String> channelMap = new HashMap<>(8);
+    static{
+        channelMap.put(PACKAGE_NAME_ADMIN, PACKAGE_NAME_ADMIN);
+        channelMap.put(PACKAGE_NAME_TT, ChannelPackage.TT.name());
+        channelMap.put(PACKAGE_NAME_FB, ChannelPackage.FB.name());
+        channelMap.put(ChannelPackage.TT.name(),PACKAGE_NAME_TT);
+        channelMap.put(ChannelPackage.FB.name(),PACKAGE_NAME_FB);
+    }
+
+    public static final String ACTION_DEVICE_LOGIN = "device-login";
+    public static final String ACTION_ACCOUNT_LOGIN = "account-login";
+    public static final String ACTION_ACCOUNT_DISCONNECT = "account-disconnect";
+    public static final String ACTION_APP_CONFIG = "app-config";
+
+    public static final String ACTION_FOLLOW = "follow";
+    public static final String ACTION_follow_list = "follow-list";
+    public static final String ACTION_CHAT_MSG= "chat-msg";
+    public static final String ACTION_CHAT_CMD= "chat-cmd";
+    public static final String ACTION_SYNC="sync";
+    public static final String ACTION_ERROR="error";
+    public static final String ACTION_CMD="cmd";
+    public static final String ACTION_USER_LIST="user-list";
+
 }

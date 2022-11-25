@@ -2,7 +2,9 @@ package com.ruoyi.tt.third;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.common.constant.RedisConstants;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.utils.CacheUtils;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import io.netty.channel.Channel;
@@ -22,32 +24,20 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @date 2020/8/21 20:58
  */
 public class SocketServerHandler extends ChannelInboundHandlerAdapter {
+
     private static final Logger log = LoggerFactory.getLogger(SocketServerHandler.class);
     public static List<String> msgs = new CopyOnWriteArrayList();
     /***连接保存**/
     private static ConcurrentHashMap<String, Channel> channelMap = new ConcurrentHashMap<>();
-    private static ConcurrentHashMap<String, String> deviceToChannel = new ConcurrentHashMap<>();
-    private static ConcurrentHashMap<String, String> channelToDevice = new ConcurrentHashMap<>();
 
     static {
         msgs.add(DateUtils.getTime() + "：" + "测试消息，请忽略(保留最近30条)！！！");
     }
 
-    public static ConcurrentHashMap<String, Channel> getChannelMap() {
-        return channelMap;
-    }
-
-    public static ConcurrentHashMap<String, String> getDeviceToChannel() {
-        return deviceToChannel;
-    }
-    public static ConcurrentHashMap<String, String> getChannelToDevice() {
-        return channelToDevice;
-    }
-
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel channel = ctx.channel();
-        log.info("{},{},{}", channel.id().toString(), ctx.channel().remoteAddress(), msg);
+        log.info("channel.id:{},{},{}", channel.id().toString(), ctx.channel().remoteAddress(), msg);
         msgs.add(0, DateUtils.getTime() + "：" + msg.toString());
         if (msgs.size() > 30) {
             msgs.remove(msgs.size() - 1);
@@ -56,9 +46,10 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
         if(msg instanceof String){
             TTSocketDto ttSocketDto = JSON.parseObject((String) msg, TTSocketDto.class);
             ttSocketDto.setChannelId(channel.id().toString());
-            R r = ttSocketService.handle(ttSocketDto);
-            r.setAction(ttSocketDto.getAction());
-            ctx.channel().writeAndFlush(JSONObject.toJSONString(r));
+            ttSocketDto.setPackageName(TTScoketConstants.getChannelMap().get(ttSocketDto.getPackageName()));
+            ttSocketDto = ttSocketService.handle(ttSocketDto);
+            ttSocketDto.setPackageName(TTScoketConstants.getChannelMap().get(ttSocketDto.getPackageName()));
+            ctx.channel().writeAndFlush(JSONObject.toJSONString(ttSocketDto));
         }else{
             ctx.channel().writeAndFlush(JSONObject.toJSONString(R.ok()));
         }
@@ -81,8 +72,6 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
         SocketAddress address = channel.remoteAddress();
         log.info("{},-----下线", address);
         channelMap.remove(channel.id().toString());
-        String deviceNo = channelToDevice.remove(channel.id().toString());
-        deviceToChannel.remove(deviceNo);
     }
 
     @Override

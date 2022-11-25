@@ -28,7 +28,7 @@ public class NettyLengthSocketClientTest {
             // 客户端发送消息
             ByteBuffer header = ByteBuffer.allocate(4);
             TTSocketDto ttSocketDto = new TTSocketDto();
-            ttSocketDto.setAction(TTScoketConstants.ACTION_CLIENT_INIT);
+            ttSocketDto.setAction(TTScoketConstants.ACTION_DEVICE_LOGIN);
             ttSocketDto.setPackageName(TTScoketConstants.PACKAGE_NAME_ADMIN);
             ttSocketDto.setAndroidId("24242");
             String msg = JSONObject.toJSONString(ttSocketDto);
