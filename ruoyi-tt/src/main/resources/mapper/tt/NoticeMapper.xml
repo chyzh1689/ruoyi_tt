@@ -29,7 +29,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                mechant_id,(select mech.mech_name from tt_mechant  mech where mech.mech_id = noti.mechant_id) mech_show,
                device_id, (select devi.device_name from tt_device  devi where devi.device_id = noti.device_id) device_show,
                mechant_id,
-               device_id,
                notice_name, notice_img_rul, notice_location, notice_flag, own_no, own_name, own_img_url,  create_by, create_time, update_by, update_time from tt_notice noti
     </sql>
 
@@ -39,10 +38,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="noticeName != null  and noticeName != ''"> and notice_name like concat('%', #{noticeName}, '%')</if>
             <if test="noticeImgRul != null  and noticeImgRul != ''"> and notice_img_rul = #{noticeImgRul}</if>
             <if test="noticeLocation != null  and noticeLocation != ''"> and notice_location = #{noticeLocation}</if>
+            <if test="channelPackage != null "> and channel_package = #{channelPackage}</if>
             <if test="noticeFlag != null "> and notice_flag = #{noticeFlag}</if>
             <if test="ownNo != null  and ownNo != ''"> and own_no = #{ownNo}</if>
             <if test="ownName != null  and ownName != ''"> and own_name like concat('%', #{ownName}, '%')</if>
             <if test="ownImgUrl != null  and ownImgUrl != ''"> and own_img_url = #{ownImgUrl}</if>
+            <if test="mechantId != null "> and mechant_id = #{mechantId}</if>
             <if test="deviceId != null "> and device_id = #{deviceId}</if>
         </where>
     </select>
@@ -51,7 +52,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectNoticeVo"/>
         where notice_no = #{noticeNo}
     </select>
-        
+
+
     <insert id="insertNotice" parameterType="Notice">
         insert into tt_notice
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -121,5 +123,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{noticeNo}
         </foreach>
     </delete>
-
+    <select id="selectNoticeForFollow" parameterType="String" resultMap="NoticeResult">
+        select notice_no,channel_package,mechant_id,device_id,notice_flag from tt_notice
+        where mechant_id = #{mechantId} and channel_package = #{channelPackage} and notice_no in
+        <foreach item="noticeNo" collection="array" open="(" separator="," close=")">
+            #{noticeNo}
+        </foreach>
+    </select>
 </mapper>

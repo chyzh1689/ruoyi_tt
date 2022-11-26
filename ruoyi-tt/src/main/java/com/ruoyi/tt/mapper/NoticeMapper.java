@@ -1,7 +1,10 @@
 package com.ruoyi.tt.mapper;
 
 import java.util.List;
+import java.util.Set;
+
 import com.ruoyi.tt.domain.Notice;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 关注信息Mapper接口
@@ -58,4 +61,14 @@ public interface NoticeMapper
      * @return 结果
      */
     public int deleteNoticeByNoticeNos(String[] noticeNos);
+
+    /**
+     * 询问关注列表
+     * @param mechId
+     * @param packageName
+     * @param noticeNos
+     * @return
+     */
+    List<Notice> selectNoticeForFollow(@Param("mechantId") Long mechId, @Param("channelPackage") String packageName,
+                                       @Param("array") String[] noticeNos);
 }

@@ -1,8 +1,9 @@
 package com.ruoyi.tt.third;
 
+import com.alibaba.fastjson.JSONArray;
 import com.ruoyi.common.constant.RedisConstants;
 import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.common.utils.CacheUtils;
+import com.ruoyi.common.json.JSONObject;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysConfigService;
@@ -10,16 +11,22 @@ import com.ruoyi.tt.TTContants;
 import com.ruoyi.tt.domain.Account;
 import com.ruoyi.tt.domain.Device;
 import com.ruoyi.tt.domain.Mechant;
+import com.ruoyi.tt.domain.Notice;
 import com.ruoyi.tt.enums.AccountStatus;
 import com.ruoyi.tt.enums.ChannelPackage;
+import com.ruoyi.tt.enums.NoticeFlag;
 import com.ruoyi.tt.enums.YesOrNoStatus;
 import com.ruoyi.tt.mapper.AccountMapper;
 import com.ruoyi.tt.mapper.DeviceMapper;
 import com.ruoyi.tt.mapper.MechantMapper;
+import com.ruoyi.tt.mapper.NoticeMapper;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
 
 @Service
 @Slf4j
@@ -39,9 +46,9 @@ public class TtSocketService {
             //获取配置
             case TTScoketConstants.ACTION_APP_CONFIG: return this.appConfig(ttSocketDto);
             //是否关注
-            case TTScoketConstants.ACTION_FOLLOW: return this.appConfig(ttSocketDto);
+            case TTScoketConstants.ACTION_FOLLOW: return this.follow(ttSocketDto);
             //关注列表
-            case TTScoketConstants.ACTION_follow_list: return this.appConfig(ttSocketDto);
+            case TTScoketConstants.ACTION_follow_list: return this.followList(ttSocketDto);
             //聊天消息
             case TTScoketConstants.ACTION_CHAT_MSG: return this.appConfig(ttSocketDto);
             //聊天指令
@@ -55,6 +62,77 @@ public class TtSocketService {
             default:
         }
         return ttSocketDto;
+    }
+
+    /**
+     * 询问结果
+     * @param ttSocketDto
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Synchronized
+    public TTSocketDto follow(TTSocketDto ttSocketDto) {
+
+        return ttSocketDto.ok();
+    }
+
+    @Autowired
+    private NoticeMapper noticeMapper;
+    /**
+     * 询问关注
+     * @param ttSocketDto
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    @Synchronized
+    public TTSocketDto followList(TTSocketDto ttSocketDto) {
+        UserInfo userInfo = ttSocketDto.getUserInfo();
+        if(userInfo==null){
+            return ttSocketDto.fail("用户信息为空！");
+        }
+        String deviceNo = redisCache.getCacheMapValue(RedisConstants.TT_CHANNEL_DEVICE,
+                ttSocketDto.getChannelId());
+        Device device = deviceMapper.selectDeviceByDeviceNo(deviceNo);
+        if(device==null||device.getMechId()==null){
+            if(device==null){
+                return ttSocketDto.fail("设备不存在！");
+            }
+        }
+        JSONArray datas = (JSONArray) ttSocketDto.getData();
+        if(datas==null || datas.size()==0){
+            return ttSocketDto.fail("询问关注账号为空！");
+        }
+        List<Notice> notices = noticeMapper.selectNoticeForFollow(device.getMechId(),
+                ttSocketDto.getPackageName(),datas.toArray(new String[]{}));
+        HashMap<String,Notice> maps = new HashMap<>();
+        for (Notice notice : notices) {
+            maps.put(notice.getNoticeNo(),notice);
+        }
+        List<String> res = new ArrayList<>(datas.size());
+        for (Object one : datas) {
+            String noticeNo = (String) one;
+            Notice notice = maps.get(noticeNo);
+            if(notice==null){
+                notice = new Notice();
+                notice.setNoticeNo(noticeNo);
+                notice.setNoticeFlag(NoticeFlag.apply.val());
+                notice.setDeviceId(device.getDeviceId());
+                notice.setMechantId(device.getMechId());
+                notice.setChannelPackage(ttSocketDto.getPackageName());
+                notice.setCreateBy("admin");
+                notice.setCreateTime(new Date());
+                noticeMapper.insertNotice(notice);
+                res.add(noticeNo);
+            }else if(NoticeFlag.free.val().equals(notice.getNoticeFlag())){
+                notice.setDeviceId(device.getDeviceId());
+                notice.setNoticeFlag(NoticeFlag.apply.val());
+                notice.setUpdateBy("admin");
+                notice.setUpdateTime(new Date());
+                noticeMapper.updateNotice(notice);
+                res.add(noticeNo);
+            }
+        }
+        return ttSocketDto.ok(res.toArray(),"返回成功！");
     }
 
     @Autowired
@@ -131,6 +209,7 @@ public class TtSocketService {
             account.setAccountName(userInfo.getUserName());
             account.setAccountImgUrl(userInfo.getImageUrl());
             account.setAccountStatus(AccountStatus.LOGIN.val());
+            account.setFollowNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NUMBER)));
             accountMapper.insertAccount(account);
         }else{
             dataAccount.setDeviceId(device.getDeviceId());

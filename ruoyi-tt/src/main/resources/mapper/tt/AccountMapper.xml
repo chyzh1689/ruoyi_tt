@@ -10,6 +10,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="mechShow"  column="mech_show"    />
         <result property="deviceId"    column="device_id"    />
         <result property="deviceShow"    column="device_show"    />
+        <result property="followNumber" column="follow_number"></result>
         <result property="accountNo"    column="account_no"    />
         <result property="accountName"    column="account_name"    />
         <result property="accountImgUrl"    column="account_img_url"    />
@@ -27,7 +28,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select account_id,
                mechant_id,(select mech.mech_name from tt_mechant  mech where mech.mech_id = acc.mechant_id) mech_show,
                device_id, (select devi.device_name from tt_device  devi where devi.device_id = acc.device_id) device_show,
-               account_no, account_name, account_img_url, account_channel, account_status, account_memo1, account_memo2, create_by, create_time, update_by, update_time from tt_account acc
+               follow_number,account_no, account_name, account_img_url, account_channel, account_status, account_memo1, account_memo2, create_by, create_time, update_by, update_time from tt_account acc
     </sql>
 
     <select id="selectAccountList" parameterType="Account" resultMap="AccountResult">
@@ -64,6 +65,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mechantId != null">mechant_id,</if>
             <if test="deviceId != null">device_id,</if>
             <if test="accountNo != null">account_no,</if>
+            <if test="followNumber != null">follow_number,</if>
             <if test="accountName != null">account_name,</if>
             <if test="accountImgUrl != null">account_img_url,</if>
             <if test="accountChannel != null">account_channel,</if>
@@ -80,6 +82,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mechantId != null">#{mechantId},</if>
             <if test="deviceId != null">#{deviceId},</if>
             <if test="accountNo != null">#{accountNo},</if>
+            <if test="followNumber != null">#{followNumber},</if>
             <if test="accountName != null">#{accountName},</if>
             <if test="accountImgUrl != null">#{accountImgUrl},</if>
             <if test="accountChannel != null">#{accountChannel},</if>
@@ -99,6 +102,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="mechantId != null">mechant_id = #{mechantId},</if>
             <if test="deviceId != null">device_id = #{deviceId},</if>
             <if test="accountNo != null">account_no = #{accountNo},</if>
+            <if test="followNumber != null">follow_number = #{followNumber},</if>
             <if test="accountName != null">account_name = #{accountName},</if>
             <if test="accountImgUrl != null">account_img_url = #{accountImgUrl},</if>
             <if test="accountChannel != null">account_channel = #{accountChannel},</if>

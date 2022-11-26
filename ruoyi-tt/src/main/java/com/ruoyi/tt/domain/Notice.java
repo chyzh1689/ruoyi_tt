@@ -39,7 +39,7 @@ public class Notice extends BaseEntity{
 
     /** 0--释放是否被关注或者回关 */
     @Excel(name = "0--释放是否被关注或者回关")
-    private Long noticeFlag;
+    private Integer noticeFlag;
 
     /** 所属账号 */
     @Excel(name = "所属账号")

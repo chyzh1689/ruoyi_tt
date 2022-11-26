@@ -11,37 +11,21 @@
                     <div class="select-list">
                         <ul>
                             <li>
-                                <label>被关注者昵称：</label>
-                                <input type="text" name="noticeName"/>
-                            </li>
-                            <li>
-                                <label>被关注者头像：</label>
-                                <input type="text" name="noticeImgRul"/>
-                            </li>
-                            <li>
-                                <label>被关注者区域：</label>
-                                <input type="text" name="noticeLocation"/>
-                            </li>
-                            <li>
-                                <label>0--释放是否被关注或者回关：</label>
-                                <input type="text" name="noticeFlag"/>
-                            </li>
-                            <li>
                                 <label>所属账号：</label>
                                 <input type="text" name="ownNo"/>
                             </li>
                             <li>
-                                <label>所属昵称：</label>
-                                <input type="text" name="ownName"/>
+                                <label>粉丝账号：</label>
+                                <input type="text" name="noticeName"/>
                             </li>
                             <li>
-                                <label>所属头像：</label>
-                                <input type="text" name="ownImgUrl"/>
+                                <label>关注状态：</label>
+                                <select name="mechType" th:with="type=${@dict.getType('tt_notice_flag')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
                             </li>
-                            <li>
-                                <label>设备id：</label>
-                                <input type="text" name="deviceId"/>
-                            </li>
+
                             <li>
                                 <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
                                 <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
@@ -52,15 +36,15 @@
             </div>
 
             <div class="btn-group-sm" id="toolbar" role="group">
-                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="tt:notice:add">
-                    <i class="fa fa-plus"></i> 添加
-                </a>
-                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="tt:notice:edit">
-                    <i class="fa fa-edit"></i> 修改
-                </a>
-                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="tt:notice:remove">
-                    <i class="fa fa-remove"></i> 删除
-                </a>
+<!--                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="tt:notice:add">-->
+<!--                    <i class="fa fa-plus"></i> 添加-->
+<!--                </a>-->
+<!--                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="tt:notice:edit">-->
+<!--                    <i class="fa fa-edit"></i> 修改-->
+<!--                </a>-->
+<!--                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="tt:notice:remove">-->
+<!--                    <i class="fa fa-remove"></i> 删除-->
+<!--                </a>-->
                 <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="tt:notice:export">
                     <i class="fa fa-download"></i> 导出
                 </a>
@@ -75,6 +59,8 @@
         var editFlag = [[${@permission.hasPermi('tt:notice:edit')}]];
         var removeFlag = [[${@permission.hasPermi('tt:notice:remove')}]];
         var prefix = ctx + "tt/notice";
+        var channels = [[${@dict.getType('tt_channel_package')}]];
+        var noticeFlags = [[${@dict.getType('tt_notice_flag')}]];
 
         $(function() {
             var options = {
@@ -92,34 +78,15 @@
                     title: '所属商户',
                 },
                 {
+                    field: 'deviceShow',
+                    title: '所属设备'
+                },
+                {
                     field: 'channelPackage',
                     title: '来源渠道',
-                },
-                {
-                    field: 'noticeNo',
-                    title: '被关注者账号',
-                    visible: false
-                },
-
-                    {
-                        field: 'deviceShow',
-                        title: ''
-                    },
-                {
-                    field: 'noticeName',
-                    title: '被关注者昵称'
-                },
-                {
-                    field: 'noticeImgRul',
-                    title: '被关注者头像'
-                },
-                {
-                    field: 'noticeLocation',
-                    title: '被关注者区域'
-                },
-                {
-                    field: 'noticeFlag',
-                    title: '0--释放是否被关注或者回关'
+                    formatter: function(value, row) {
+                        return $.table.selectDictLabel(channels, row.channelPackage);
+                    }
                 },
                 {
                     field: 'ownNo',
@@ -127,20 +94,39 @@
                 },
                 {
                     field: 'ownName',
-                    title: '所属昵称'
+                    title: '所属昵称',
+                    visible: false
                 },
                 {
-                    field: 'ownImgUrl',
-                    title: '所属头像'
+                    field: 'noticeNo',
+                    title: '粉丝账号',
                 },
-
+                {
+                    field: 'noticeName',
+                    title: '粉丝昵称'
+                },
+                {
+                    field: 'noticeImgRul',
+                    title: '粉丝头像'
+                },
+                {
+                    field: 'noticeLocation',
+                    title: '粉丝区域'
+                },
+                {
+                    field: 'noticeFlag',
+                    title: '关注状态',
+                    formatter: function(value, row) {
+                        return $.table.selectDictLabel(noticeFlags, row.noticeFlag);
+                    }
+                },
                 {
                     title: '操作',
                     align: 'center',
+                    visible: false,
                     formatter: function(value, row, index) {
                         var actions = [];
-                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.noticeNo + '\')"><i class="fa fa-edit"></i>编辑</a> ');
-                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.noticeNo + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        //actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.noticeNo + '\')"><i class="fa fa-edit"></i>编辑</a> ');
                         return actions.join('');
                     }
                 }]

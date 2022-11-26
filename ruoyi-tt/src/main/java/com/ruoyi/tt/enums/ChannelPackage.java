@@ -10,7 +10,8 @@ import java.util.Map;
  */
 public enum ChannelPackage {
     TT(1),
-    FB(2);
+    FB(2),
+    DY(3);
     private int val;
     ChannelPackage (Integer val){
         this.val= val;

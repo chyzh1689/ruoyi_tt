@@ -11,7 +11,7 @@ public class TTScoketConstants {
     /***推特账号 登录***/
     public static final String PACKAGE_NAME_TT ="com.twitter.android";
     public static final String PACKAGE_NAME_FB ="com.facebook.android";
-
+    public static final String PACKAGE_NAME_DY ="com.ss.android.ugc.aweme";
 
     public static Map<String, String> getChannelMap() {
         return channelMap;
@@ -22,8 +22,10 @@ public class TTScoketConstants {
         channelMap.put(PACKAGE_NAME_ADMIN, PACKAGE_NAME_ADMIN);
         channelMap.put(PACKAGE_NAME_TT, ChannelPackage.TT.name());
         channelMap.put(PACKAGE_NAME_FB, ChannelPackage.FB.name());
+        channelMap.put(PACKAGE_NAME_DY,ChannelPackage.DY.name());
         channelMap.put(ChannelPackage.TT.name(),PACKAGE_NAME_TT);
         channelMap.put(ChannelPackage.FB.name(),PACKAGE_NAME_FB);
+        channelMap.put(ChannelPackage.DY.name(),PACKAGE_NAME_DY);
     }
 
     public static final String ACTION_DEVICE_LOGIN = "device-login";

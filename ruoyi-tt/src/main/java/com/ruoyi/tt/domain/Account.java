@@ -31,6 +31,10 @@ public class Account extends BaseEntity{
     @Excel(name = "账号")
     private String accountNo;
 
+    /**每日关注数量**/
+    @Excel(name="每日关注数量")
+    private Integer followNumber;
+
     /** 账号昵称 */
     @Excel(name = "账号昵称")
     private String accountName;
