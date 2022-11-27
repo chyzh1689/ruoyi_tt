@@ -72,8 +72,98 @@ public class TtSocketService {
     @Transactional(rollbackFor = Exception.class)
     @Synchronized
     public TTSocketDto follow(TTSocketDto ttSocketDto) {
+        UserInfo userInfo = ttSocketDto.getUserInfo();
+        if(userInfo==null||StringUtils.isEmpty(userInfo.getUserId())){
+            return ttSocketDto.fail("用户信息为空！");
+        }
+        String ownNo = userInfo.getUserId();
+        String deviceNo = redisCache.getCacheMapValue(RedisConstants.TT_CHANNEL_DEVICE,
+                ttSocketDto.getChannelId());
+        Device device = deviceMapper.selectDeviceByDeviceNo(deviceNo);
+        if(device==null||device.getMechId()==null){
+            if(device==null){
+                return ttSocketDto.fail("设备不存在！");
+            }
+        }
+        JSONObject data = (JSONObject) ttSocketDto.getData();
+        if(data==null){
+            return ttSocketDto.fail("要关注对象为空！");
+        }
+        UserFollowInfo followInfo = data.asBean(UserFollowInfo.class);
+        String status = followInfo.getStatus();
+        if(StringUtils.isEmpty(status)){
+            return ttSocketDto.fail("要关注对象状态为空！");
+        }
+        Integer noticeFlag = Integer.parseInt(status);
+        String noticeNo = userInfo.getUserId();
+        Notice notice = noticeMapper.selectNoticeForFollow(device.getMechId(),
+                ttSocketDto.getPackageName(),noticeNo);
+        String dateStr = DateUtils.dateTime();
+        String key = userInfo.getUserId()+"@"+device.getMechId()+"@"+ttSocketDto.getPackageName();
+        Integer oldNoticeFllag = NoticeFlag.free.val();;
+        if(notice==null){
+            notice = new Notice();
+            notice.setNoticeNo(noticeNo);
+            notice.setNoticeFlag(noticeFlag);
+            notice.setDeviceId(device.getDeviceId());
+            notice.setMechantId(device.getMechId());
+            notice.setChannelPackage(ttSocketDto.getPackageName());
+            notice.setCreateBy("admin");
+            notice.setCreateTime(new Date());
+            notice.setNoticeName(followInfo.getUserName());
+            notice.setNoticeLocation(followInfo.getLocation());
+            notice.setNoticeImgRul(followInfo.getImageUrl());
+            noticeMapper.insertNotice(notice);
+        }else if(NoticeFlag.free.val().equals(notice.getNoticeFlag()) ||
+                (!noticeFlag.equals(notice.getNoticeFlag()) && ownNo.equals(notice.getOwnNo()))){
+            oldNoticeFllag = notice.getNoticeFlag();
+            notice.setDeviceId(device.getDeviceId());
+            notice.setNoticeFlag(noticeFlag);
+            notice.setUpdateBy("admin");
+            notice.setUpdateTime(new Date());
+            notice.setNoticeName(followInfo.getUserName());
+            notice.setNoticeLocation(followInfo.getLocation());
+            notice.setNoticeImgRul(followInfo.getImageUrl());
+            noticeMapper.updateNotice(notice);
 
+        }else{
+            return ttSocketDto.fail("关注状态异常！");
+        }
+        this.updateNumForNoticeFlag(noticeFlag, dateStr, key,oldNoticeFllag);
         return ttSocketDto.ok();
+    }
+
+    private void updateNumForNoticeFlag(Integer noticeFlag, String dateStr, String key,Integer oldNoticeFllag) {
+        if(NoticeFlag.free.val().equals(oldNoticeFllag) &&
+                NoticeFlag.apply.val().equals(noticeFlag)){
+            Integer applyNum = redisCache.getCacheMapValue(dateStr + TTContants.cache_key_tt_day_apply_number, key);
+            if(applyNum!=null){
+                applyNum++;
+            }else{
+                applyNum=1;
+            }
+            redisCache.setCacheMapValue(dateStr + TTContants.cache_key_tt_day_apply_number, key,applyNum);
+        }else if(NoticeFlag.apply.val().equals(oldNoticeFllag) &&
+                (NoticeFlag.notice.val().equals(noticeFlag) || NoticeFlag.back.val().equals(noticeFlag))){
+            Integer followNum = redisCache.getCacheMapValue(dateStr + TTContants.cache_key_tt_day_follow_number, key);
+            if(followNum!=null){
+                followNum++;
+            }else{
+                followNum=1;
+            }
+            redisCache.setCacheMapValue(dateStr + TTContants.cache_key_tt_day_follow_number, key,followNum);
+
+            Integer applyNum = redisCache.getCacheMapValue(dateStr + TTContants.cache_key_tt_day_apply_number, key);
+            if(applyNum!=null){
+                applyNum--;
+            }else{
+                applyNum=0;
+            }
+            if(applyNum<0){
+                applyNum=0;
+            }
+            redisCache.setCacheMapValue(dateStr + TTContants.cache_key_tt_day_apply_number, key,applyNum);
+        }
     }
 
     @Autowired
@@ -102,7 +192,31 @@ public class TtSocketService {
         if(datas==null || datas.size()==0){
             return ttSocketDto.fail("询问关注账号为空！");
         }
-        List<Notice> notices = noticeMapper.selectNoticeForFollow(device.getMechId(),
+        Account account = new Account();
+        account.setMechantId(device.getMechId());
+        account.setAccountChannel(ttSocketDto.getPackageName());
+        account.setAccountNo(userInfo.getUserId());
+        account = accountMapper.selectAccount(account);
+        if(account==null){
+            return ttSocketDto.fail("账号信息不存在！");
+        }
+        Integer remainNum = account.getFollowNumber();
+        String dateStr = DateUtils.dateTime();
+        String key = account.getAccountNo()+"@"+account.getMechantId()+"@"+account.getAccountChannel();
+        //当天正在关注数量
+        Integer applyNum = redisCache.getCacheMapValue(dateStr + TTContants.cache_key_tt_day_apply_number,key);
+        if(applyNum!=null){
+            remainNum-=applyNum;
+        }
+        //当天关注成功数量
+        Integer followNum = redisCache.getCacheMapValue(dateStr + TTContants.cache_key_tt_day_follow_number,key);
+        if(followNum!=null){
+            remainNum-=followNum;
+        }
+        if(remainNum<=0){
+            return ttSocketDto.fail("剩余关注数量不足够，请加大配置数量！");
+        }
+        List<Notice> notices = noticeMapper.selectNoticeForFollowList(device.getMechId(),
                 ttSocketDto.getPackageName(),datas.toArray(new String[]{}));
         HashMap<String,Notice> maps = new HashMap<>();
         for (Notice notice : notices) {
@@ -122,6 +236,7 @@ public class TtSocketService {
                 notice.setCreateBy("admin");
                 notice.setCreateTime(new Date());
                 noticeMapper.insertNotice(notice);
+                remainNum--;
                 res.add(noticeNo);
             }else if(NoticeFlag.free.val().equals(notice.getNoticeFlag())){
                 notice.setDeviceId(device.getDeviceId());
@@ -129,9 +244,20 @@ public class TtSocketService {
                 notice.setUpdateBy("admin");
                 notice.setUpdateTime(new Date());
                 noticeMapper.updateNotice(notice);
+                remainNum--;
                 res.add(noticeNo);
             }
+            if(remainNum==0){
+                break;
+            }
         }
+        //更新正在关注数量
+        if(applyNum == null){
+            applyNum = res.size();
+        }else{
+            applyNum+=res.size();
+        }
+        redisCache.setCacheMapValue(dateStr + TTContants.cache_key_tt_day_apply_number,key,applyNum);
         return ttSocketDto.ok(res.toArray(),"返回成功！");
     }
 
@@ -147,11 +273,41 @@ public class TtSocketService {
         if(userInfo==null){
             return ttSocketDto.fail("用户信息为空！");
         }
+
+        String deviceNo = redisCache.getCacheMapValue(RedisConstants.TT_CHANNEL_DEVICE,ttSocketDto.getChannelId());
+        Device device = deviceMapper.selectDeviceByDeviceNo(deviceNo);
+        if(device==null){
+            if(device==null){
+                return ttSocketDto.fail("设备不存在！");
+            }
+        }
+        Account account = new Account();
+        account.setMechantId(device.getMechId());
+        account.setAccountChannel(ttSocketDto.getPackageName());
+        account.setAccountNo(userInfo.getUserId());
+        account = accountMapper.selectAccount(account);
+        if(account==null){
+            return ttSocketDto.fail("账号信息不存在！");
+        }
         Follow follow = new Follow();
+        Integer remainNum = account.getFollowNumber();
+        String dateStr = DateUtils.dateTime();
+        String key = account.getAccountNo()+"@"+account.getMechantId()+"@"+account.getAccountChannel();
+        //当天正在关注数量
+        Integer applyNum = redisCache.getCacheMapValue(dateStr + TTContants.cache_key_tt_day_apply_number,key);
+        if(applyNum!=null){
+            remainNum-=applyNum;
+        }
+        //当天关注成功数量
+        Integer followNum = redisCache.getCacheMapValue(dateStr + TTContants.cache_key_tt_day_follow_number,key);
+        if(followNum!=null){
+            remainNum-=followNum;
+        }
+        //设置每日关注数量
+        follow.setNumber(remainNum);
         follow.setNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SEX)));
         follow.setNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINAGE)));
         follow.setNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXAGE)));
-        follow.setNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NUMBER)));
         follow.setMinSpeed(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINSPEED)));
         follow.setMaxSpeed(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXSPEED)));
         follow.setSleepTime(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SLEEPTIME)));
@@ -159,7 +315,7 @@ public class TtSocketService {
         Match match = new Match();
         follow.setMatch(match);
         match.setNickname(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NICKNAME));
-        match.setSignature(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NICKNAME));
+        match.setSignature(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SIGNATURE));
         match.setComment(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_COMMENT));
         return ttSocketDto.ok(follow,"获取配置信息成功！");
     }

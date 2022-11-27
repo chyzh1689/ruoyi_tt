@@ -69,6 +69,9 @@ public interface NoticeMapper
      * @param noticeNos
      * @return
      */
-    List<Notice> selectNoticeForFollow(@Param("mechantId") Long mechId, @Param("channelPackage") String packageName,
+    List<Notice> selectNoticeForFollowList(@Param("mechantId") Long mechId, @Param("channelPackage") String packageName,
                                        @Param("array") String[] noticeNos);
+
+    Notice selectNoticeForFollow(@Param("mechantId") Long mechId, @Param("channelPackage") String packageName,
+                                       @Param("noticeNo") String noticeNo);
 }

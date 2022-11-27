@@ -23,6 +23,7 @@ public class TTScoketConstants {
         channelMap.put(PACKAGE_NAME_TT, ChannelPackage.TT.name());
         channelMap.put(PACKAGE_NAME_FB, ChannelPackage.FB.name());
         channelMap.put(PACKAGE_NAME_DY,ChannelPackage.DY.name());
+
         channelMap.put(ChannelPackage.TT.name(),PACKAGE_NAME_TT);
         channelMap.put(ChannelPackage.FB.name(),PACKAGE_NAME_FB);
         channelMap.put(ChannelPackage.DY.name(),PACKAGE_NAME_DY);

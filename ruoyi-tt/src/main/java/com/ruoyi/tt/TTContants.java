@@ -4,6 +4,7 @@ public class TTContants {
 
     public static final Long VAL_PARENT_ID = 0L;
 
+    /**app-config配置信息**/
     public static final String CACHE_KEY_TT_FOLLOW_NUMBER = "tt.follow.number";
     public static final String CACHE_KEY_TT_FOLLOW_MINSPEED = "tt.follow.minSpeed";
     public static final String CACHE_KEY_TT_FOLLOW_MAXSPEED = "tt.follow.maxSpeed";
@@ -15,6 +16,11 @@ public class TTContants {
     public static final String CACHE_KEY_TT_FOLLOW_SEX = "tt.follow.sex";
     public static final String CACHE_KEY_TT_FOLLOW_MINAGE = "tt.follow.minAge";
     public static final String CACHE_KEY_TT_FOLLOW_MAXAGE = "tt.follow.maxAge";
+
+    /***每日关注数量***/
+    public static final String cache_key_tt_day_follow_number="tt.day.follow.number";
+    /***每日正在申请数量***/
+    public static final String cache_key_tt_day_apply_number="tt.day.apply.number";
 
 
 }

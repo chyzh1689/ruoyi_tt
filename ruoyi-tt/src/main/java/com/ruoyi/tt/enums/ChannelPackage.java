@@ -20,6 +20,7 @@ public enum ChannelPackage {
     static{
         codeMap.put(TT.name(), TT.val());
         codeMap.put(FB.name(), FB.val());
+        codeMap.put(DY.name(), DY.val());
     }
     public static Map<String, Integer> codeMap(){
         return codeMap;

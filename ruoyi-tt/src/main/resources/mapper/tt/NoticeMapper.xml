@@ -123,11 +123,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{noticeNo}
         </foreach>
     </delete>
-    <select id="selectNoticeForFollow" parameterType="String" resultMap="NoticeResult">
+    <select id="selectNoticeForFollowList" parameterType="String" resultMap="NoticeResult">
         select notice_no,channel_package,mechant_id,device_id,notice_flag from tt_notice
         where mechant_id = #{mechantId} and channel_package = #{channelPackage} and notice_no in
         <foreach item="noticeNo" collection="array" open="(" separator="," close=")">
             #{noticeNo}
         </foreach>
+    </select>
+    <select id="selectNoticeForFollow" parameterType="String" resultMap="NoticeResult">
+        select notice_no,channel_package,mechant_id,device_id,own_no,notice_flag from tt_notice
+        where mechant_id = #{mechantId} and channel_package = #{channelPackage} and notice_no = #{noticeNo}
     </select>
 </mapper>
