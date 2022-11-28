@@ -21,6 +21,6 @@ public class TTContants {
     public static final String cache_key_tt_day_follow_number="tt.day.follow.number";
     /***每日正在申请数量***/
     public static final String cache_key_tt_day_apply_number="tt.day.apply.number";
-
-
+    /***12h**/
+    public static final String cache_key_tt_room_user_data = "tt.user.room.user.data";
 }

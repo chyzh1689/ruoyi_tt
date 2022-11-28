@@ -49,7 +49,17 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
             ttSocketDto.setPackageName(TTScoketConstants.getChannelMap().get(ttSocketDto.getPackageName()));
             ttSocketDto = ttSocketService.handle(ttSocketDto);
             ttSocketDto.setPackageName(TTScoketConstants.getChannelMap().get(ttSocketDto.getPackageName()));
-            ctx.channel().writeAndFlush(JSONObject.toJSONString(ttSocketDto));
+            if(TTScoketConstants.ACTION_APP_CONFIG.equals(ttSocketDto.getAction())||
+            TTScoketConstants.ACTION_SYNC.equals(ttSocketDto.getAction())||
+            TTScoketConstants.ACTION_QUERY_ROOM.equals(ttSocketDto.getAction())||
+            TTScoketConstants.ACTION_follow_list.equals(ttSocketDto.getAction())){
+            }else{
+                ttSocketDto.setAction(null);
+                ttSocketDto.setData(null);
+            }
+            String s = JSONObject.toJSONString(ttSocketDto);
+            log.info(ttSocketDto.getAction() +" : s-length:"+s.length());
+            ctx.channel().writeAndFlush(s);
         }else{
             ctx.channel().writeAndFlush(JSONObject.toJSONString(R.ok()));
         }

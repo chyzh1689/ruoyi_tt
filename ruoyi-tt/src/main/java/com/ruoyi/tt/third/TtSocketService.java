@@ -1,9 +1,9 @@
 package com.ruoyi.tt.third;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.constant.RedisConstants;
 import com.ruoyi.common.core.redis.RedisCache;
-import com.ruoyi.common.json.JSONObject;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysConfigService;
@@ -54,14 +54,51 @@ public class TtSocketService {
             //聊天指令
             case TTScoketConstants.ACTION_CHAT_CMD: return this.appConfig(ttSocketDto);
             //同步心跳
-            case TTScoketConstants.ACTION_SYNC: return this.appConfig(ttSocketDto);
+            case TTScoketConstants.ACTION_SYNC: return this.sync(ttSocketDto);
             //操作指令
             case TTScoketConstants.ACTION_CMD: return this.appConfig(ttSocketDto);
             //获取粉丝列表
             case TTScoketConstants.ACTION_USER_LIST: return this.appConfig(ttSocketDto);
+            //进入房间
+            case TTScoketConstants.ACTION_ENTER_ROOM: return  this.enterRoom(ttSocketDto);
+            //查询
+            case TTScoketConstants.ACTION_QUERY_ROOM: return this.queryRoom(ttSocketDto);
             default:
         }
         return ttSocketDto;
+    }
+
+    /***
+     * @param ttSocketDto
+     * @return
+     */
+    private TTSocketDto sync(TTSocketDto ttSocketDto) {
+        return ttSocketDto.ok();
+    }
+
+    /**
+     *
+     * @param ttSocketDto
+     * @return
+     */
+    private TTSocketDto queryRoom(TTSocketDto ttSocketDto) {
+        JSONObject obj = (JSONObject) ttSocketDto.getData();
+        String userId = (String) obj.get("userId");
+        obj = redisCache.getCacheMapValue(TTContants.cache_key_tt_room_user_data, userId);
+        //obj = JSONObject.parseObject(data);
+        return ttSocketDto.ok(obj);
+    }
+
+    /**
+     *
+     * @param ttSocketDto
+     * @return
+     */
+    private TTSocketDto enterRoom(TTSocketDto ttSocketDto) {
+        JSONObject data = (JSONObject) ttSocketDto.getData();
+        String userId = (String) data.get("userId");
+        redisCache.setCacheMapValue(TTContants.cache_key_tt_room_user_data,userId,data);
+        return ttSocketDto.ok();
     }
 
     /**
@@ -89,7 +126,7 @@ public class TtSocketService {
         if(data==null){
             return ttSocketDto.fail("要关注对象为空！");
         }
-        UserFollowInfo followInfo = data.asBean(UserFollowInfo.class);
+        UserFollowInfo followInfo = data.toJavaObject(UserFollowInfo.class);
         String status = followInfo.getStatus();
         if(StringUtils.isEmpty(status)){
             return ttSocketDto.fail("要关注对象状态为空！");
@@ -216,15 +253,22 @@ public class TtSocketService {
         if(remainNum<=0){
             return ttSocketDto.fail("剩余关注数量不足够，请加大配置数量！");
         }
+        String[] noticeNos = new String[datas.size()];
+        int idx = 0;
+        for (Object data : datas) {
+            JSONObject obj = (JSONObject) data;
+            noticeNos[idx++] = (String) obj.get("userId");
+        }
         List<Notice> notices = noticeMapper.selectNoticeForFollowList(device.getMechId(),
-                ttSocketDto.getPackageName(),datas.toArray(new String[]{}));
+                ttSocketDto.getPackageName(),noticeNos);
         HashMap<String,Notice> maps = new HashMap<>();
         for (Notice notice : notices) {
             maps.put(notice.getNoticeNo(),notice);
         }
         List<String> res = new ArrayList<>(datas.size());
         for (Object one : datas) {
-            String noticeNo = (String) one;
+            JSONObject jo = (JSONObject) one;
+            String noticeNo = jo.getString(TTScoketConstants.param_user_id);
             Notice notice = maps.get(noticeNo);
             if(notice==null){
                 notice = new Notice();
@@ -233,6 +277,9 @@ public class TtSocketService {
                 notice.setDeviceId(device.getDeviceId());
                 notice.setMechantId(device.getMechId());
                 notice.setChannelPackage(ttSocketDto.getPackageName());
+                notice.setNoticeName(jo.getString(TTScoketConstants.param_user_name));
+                notice.setNoticeImgRul(jo.getString(TTScoketConstants.param_image_url));
+                notice.setNoticeLocation(jo.getString(TTScoketConstants.param_location));
                 notice.setCreateBy("admin");
                 notice.setCreateTime(new Date());
                 noticeMapper.insertNotice(notice);
@@ -241,6 +288,9 @@ public class TtSocketService {
             }else if(NoticeFlag.free.val().equals(notice.getNoticeFlag())){
                 notice.setDeviceId(device.getDeviceId());
                 notice.setNoticeFlag(NoticeFlag.apply.val());
+                notice.setNoticeName(jo.getString(TTScoketConstants.param_user_name));
+                notice.setNoticeImgRul(jo.getString(TTScoketConstants.param_image_url));
+                notice.setNoticeLocation(jo.getString(TTScoketConstants.param_location));
                 notice.setUpdateBy("admin");
                 notice.setUpdateTime(new Date());
                 noticeMapper.updateNotice(notice);
@@ -306,8 +356,8 @@ public class TtSocketService {
         //设置每日关注数量
         follow.setNumber(remainNum);
         follow.setNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SEX)));
-        follow.setNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINAGE)));
-        follow.setNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXAGE)));
+        follow.setMinAge(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINAGE)));
+        follow.setMaxAge(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXAGE)));
         follow.setMinSpeed(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINSPEED)));
         follow.setMaxSpeed(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXSPEED)));
         follow.setSleepTime(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SLEEPTIME)));
@@ -317,7 +367,9 @@ public class TtSocketService {
         match.setNickname(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NICKNAME));
         match.setSignature(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SIGNATURE));
         match.setComment(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_COMMENT));
-        return ttSocketDto.ok(follow,"获取配置信息成功！");
+        JSONObject obj = new JSONObject();
+        obj.put("follow",follow);
+        return ttSocketDto.ok(obj,"获取配置信息成功！");
     }
 
 

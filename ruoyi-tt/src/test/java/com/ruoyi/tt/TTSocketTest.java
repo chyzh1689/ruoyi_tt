@@ -14,11 +14,14 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 
 @Slf4j
 public class TTSocketTest {
-    String host = "localhost";
+    //String host = "localhost";
 //    String host = "139.198.40.36";
+    String host = "192.168.69.99";
+
     int port = 8011;
 
     @Test
@@ -32,14 +35,26 @@ public class TTSocketTest {
             //登录设备
             sendAndResp(this.deviceLogin(), out, in);
             //发送关注列表
-            sendAndResp(this.followList(),out,in);
-
+            //sendAndResp(this.followList(),out,in);
+            //查询房间
+            sendAndResp(this.queryRoom(),out,in);
             out.close();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    public TTSocketDto queryRoom(){
+        TTSocketDto ttSocketDto = new TTSocketDto();
+        ttSocketDto.setAction(TTScoketConstants.ACTION_QUERY_ROOM);
+        ttSocketDto.setPackageName(TTScoketConstants.PACKAGE_NAME_DY);
+        ttSocketDto.setUserInfo(new UserInfo());
+        ttSocketDto.setAndroidId("24242");
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserId("2696429506138520");
+        ttSocketDto.setData(userInfo);
+        return ttSocketDto;
     }
     /***
      * 询问关注列表
@@ -105,15 +120,20 @@ public class TTSocketTest {
         out.write(msgBytes);
         out.flush();
         byte[] responseLengthBytes = new byte[4];
-        int readI = in.read(responseLengthBytes);
-        System.out.println("已读长度为：" + readI);
+        //int readed = in.read(responseLengthBytes);
+        System.out.println("返回长度：" + new String(responseLengthBytes, 0, 4));
         // 客户端接收消息
         byte[] responseContentBytes = new byte[1024];
-        int readed = in.read(responseContentBytes);
-        if (readed > 0) {
+
+        int readLen = 0;
+        StringBuilder sb = new StringBuilder();
+        while (readLen < 100) {
+            int readed = in.read(responseContentBytes);
             System.out.println("已读长度为：" + readed);
             String responseContent = new String(responseContentBytes, 0, readed);
-            System.out.println("服务器端响应内容：" + responseContent);
+            sb.append(responseContent);
+            readLen+=readed;
         }
+        System.out.println("服务器端响应内容：" + sb.toString());
     }
 }

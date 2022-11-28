@@ -11,5 +11,6 @@ public class UserFollowInfo {
     private String userName;  //用户昵称
     private String imageUrl; //头像地址
     private String location;//地址
-    private String status;
+    private String secUid; //加密Id
+    private String status; //状态
 }

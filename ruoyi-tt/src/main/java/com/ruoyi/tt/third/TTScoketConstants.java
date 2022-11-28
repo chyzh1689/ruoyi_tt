@@ -42,5 +42,15 @@ public class TTScoketConstants {
     public static final String ACTION_ERROR="error";
     public static final String ACTION_CMD="cmd";
     public static final String ACTION_USER_LIST="user-list";
+    public static final String ACTION_ENTER_ROOM="enter-room";
+    public static final String ACTION_QUERY_ROOM="query-room";
+
+    public static final String param_user_id = "userId";
+    public static final String param_sec_uid = "secUid";
+    public static final String param_user_name = "userName";
+    public static final String param_location = "location";
+    public static final String param_image_url = "imageUrl";
+    public static final String param_status = "status";
+
 
 }
