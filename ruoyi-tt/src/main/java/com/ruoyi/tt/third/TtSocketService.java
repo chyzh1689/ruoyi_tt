@@ -347,11 +347,11 @@ public class TtSocketService {
         if(account==null){
             return ttSocketDto.fail("账号信息不存在！");
         }
-        JSONObject obj = getAppConfig(account);
+        JSONObject obj = getAppConfig(account,device);
         return ttSocketDto.ok(obj,"获取配置信息成功！");
     }
 
-    public JSONObject getAppConfig(Account account) {
+    public JSONObject getAppConfig(Account account,Device device) {
         Follow follow = new Follow();
         Integer remainNum = account.getFollowNumber();
         String dateStr = DateUtils.dateTime();
@@ -368,18 +368,18 @@ public class TtSocketService {
         }
         //设置每日关注数量
         follow.setNumber(remainNum);
-        follow.setSex(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SEX)));
-        follow.setMinAge(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINAGE)));
-        follow.setMaxAge(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXAGE)));
-        follow.setMinSpeed(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINSPEED)));
-        follow.setMaxSpeed(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXSPEED)));
-        follow.setSleepTime(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SLEEPTIME)));
-        follow.setSleepCount(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SLEEPCOUNT)));
+        follow.setSex(device.getFollowSex());
+        follow.setMinAge(device.getFollowMinAge());
+        follow.setMaxAge(device.getFollowMaxAge());
+        follow.setMinSpeed(1000L * device.getFollowMinSpeed());
+        follow.setMaxSpeed(1000L * device.getFollowMaxSpeed());
+        follow.setSleepTime(1000L * device.getFollowSleepTime());
+        follow.setSleepCount(device.getFollowSleepCount());
         Match match = new Match();
         follow.setMatch(match);
-        match.setNickname(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NICKNAME));
-        match.setSignature(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SIGNATURE));
-        match.setComment(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_COMMENT));
+        match.setNickname(device.getFollowMatchNickname());
+        match.setSignature(device.getFollowMatchSignature());
+        match.setComment(device.getFollowMatchComment());
         JSONObject obj = new JSONObject();
         obj.put("follow",follow);
         return obj;
@@ -431,7 +431,7 @@ public class TtSocketService {
             account.setAccountName(userInfo.getUserName());
             account.setAccountImgUrl(userInfo.getImageUrl());
             account.setAccountStatus(AccountStatus.LOGIN.val());
-            account.setFollowNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NUMBER)));
+            account.setFollowNumber(device.getFollowNumber());
             accountMapper.insertAccount(account);
         }else{
             dataAccount.setDeviceId(device.getDeviceId());

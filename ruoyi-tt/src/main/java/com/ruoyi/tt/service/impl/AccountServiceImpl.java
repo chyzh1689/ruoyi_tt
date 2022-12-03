@@ -100,7 +100,7 @@ public class AccountServiceImpl implements IAccountService
                 }
                 Channel channel = SocketServerHandler.getChannelMap().get(channelId);
                 if(channel!=null){
-                    JSONObject appConfig = ttSocketService.getAppConfig(account);
+                    JSONObject appConfig = ttSocketService.getAppConfig(account,device);
                     TTSocketDto ttSocketDto = new TTSocketDto();
                     ttSocketDto.setAction(TTScoketConstants.ACTION_APP_CONFIG);
                     ttSocketDto.setPackageName(TTScoketConstants.getChannelMap().get(account.getAccountChannel()));
