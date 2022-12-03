@@ -27,6 +27,11 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger log = LoggerFactory.getLogger(SocketServerHandler.class);
     public static List<String> msgs = new CopyOnWriteArrayList();
+
+    public static ConcurrentHashMap<String, Channel> getChannelMap() {
+        return channelMap;
+    }
+
     /***连接保存**/
     private static ConcurrentHashMap<String, Channel> channelMap = new ConcurrentHashMap<>();
 
@@ -53,12 +58,13 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
             TTScoketConstants.ACTION_SYNC.equals(ttSocketDto.getAction())||
             TTScoketConstants.ACTION_QUERY_ROOM.equals(ttSocketDto.getAction())||
             TTScoketConstants.ACTION_follow_list.equals(ttSocketDto.getAction())){
+
             }else{
                 ttSocketDto.setAction(null);
                 ttSocketDto.setData(null);
             }
             String s = JSONObject.toJSONString(ttSocketDto);
-            log.info(ttSocketDto.getAction() +" : s-length:"+s.length());
+            log.info(ttSocketDto.getAction() +" : s-length:"+s.length()+"msg:"+s);
             ctx.channel().writeAndFlush(s);
         }else{
             ctx.channel().writeAndFlush(JSONObject.toJSONString(R.ok()));

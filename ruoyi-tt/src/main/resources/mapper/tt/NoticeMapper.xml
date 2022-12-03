@@ -9,6 +9,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="mechantId"    column="mechant_id"    />
         <result property="mechShow"  column="mech_show"    />
         <result property="deviceId"    column="device_id"    />
+        <result property="ownId"    column="own_id"></result>
         <result property="deviceShow"    column="device_show"    />
         <result property="channelPackage"    column="channel_package"    />
         <result property="noticeName"    column="notice_name"    />
@@ -28,7 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select notice_no,channel_package,
                mechant_id,(select mech.mech_name from tt_mechant  mech where mech.mech_id = noti.mechant_id) mech_show,
                device_id, (select devi.device_name from tt_device  devi where devi.device_id = noti.device_id) device_show,
-               mechant_id,
+               mechant_id,own_id,
                notice_name, notice_img_rul, notice_location, notice_flag, own_no, own_name, own_img_url,  create_by, create_time, update_by, update_time from tt_notice noti
     </sql>
 
@@ -45,6 +46,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="ownImgUrl != null  and ownImgUrl != ''"> and own_img_url = #{ownImgUrl}</if>
             <if test="mechantId != null "> and mechant_id = #{mechantId}</if>
             <if test="deviceId != null "> and device_id = #{deviceId}</if>
+            <if test="ownId != null "> and own_id = #{ownId}</if>
         </where>
     </select>
     
@@ -65,6 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="noticeLocation != null">notice_location,</if>
             <if test="noticeFlag != null">notice_flag,</if>
             <if test="ownNo != null">own_no,</if>
+            <if test="ownId != null">own_id,</if>
             <if test="ownName != null">own_name,</if>
             <if test="ownImgUrl != null">own_img_url,</if>
             <if test="deviceId != null">device_id,</if>
@@ -82,6 +85,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="noticeLocation != null">#{noticeLocation},</if>
             <if test="noticeFlag != null">#{noticeFlag},</if>
             <if test="ownNo != null">#{ownNo},</if>
+            <if test="ownId != null">#{ownId},</if>
             <if test="ownName != null">#{ownName},</if>
             <if test="ownImgUrl != null">#{ownImgUrl},</if>
             <if test="deviceId != null">#{deviceId},</if>
@@ -101,6 +105,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="noticeImgRul != null">notice_img_rul = #{noticeImgRul},</if>
             <if test="noticeLocation != null">notice_location = #{noticeLocation},</if>
             <if test="noticeFlag != null">notice_flag = #{noticeFlag},</if>
+            <if test="ownId != null">own_id = #{ownId},</if>
             <if test="ownNo != null">own_no = #{ownNo},</if>
             <if test="ownName != null">own_name = #{ownName},</if>
             <if test="ownImgUrl != null">own_img_url = #{ownImgUrl},</if>

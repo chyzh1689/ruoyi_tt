@@ -60,6 +60,49 @@ public class Device extends BaseEntity{
     @Excel(name = "备注2")
     private String deviceMemo2;
 
+    /** 每日关注数量 */
+    @Excel(name = "每日关注数量")
+    private Integer followNumber;
+
+    /** 最小关注速度 */
+    @Excel(name = "最小关注速度")
+    private Integer followMinSpeed;
+
+    /** 最大关注速度 */
+    @Excel(name = "最大关注速度")
+    private Integer followMaxSpeed;
+
+    /** 休眠时间 */
+    @Excel(name = "休眠时间")
+    private Integer followSleepTime;
+
+    /** 休眠需关注数 */
+    @Excel(name = "休眠需关注数")
+    private Integer followSleepCount;
+
+    /** 匹配昵称 */
+    @Excel(name = "匹配昵称")
+    private String followMatchNickname;
+
+    /** 匹配签名 */
+    @Excel(name = "匹配签名")
+    private String followMatchSignature;
+
+    /** 匹配评论 */
+    @Excel(name = "匹配评论")
+    private String followMatchComment;
+
+    /** 性别 */
+    @Excel(name = "性别")
+    private Integer followSex;
+
+    /** 最小年龄 */
+    @Excel(name = "最小年龄")
+    private Integer followMinAge;
+
+    /** 最大年龄 */
+    @Excel(name = "最大年龄")
+    private Integer followMaxAge;
 
     private String mechName;
     private String mechOwnName;

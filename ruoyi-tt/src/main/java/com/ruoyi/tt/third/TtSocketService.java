@@ -119,7 +119,7 @@ public class TtSocketService {
         Device device = deviceMapper.selectDeviceByDeviceNo(deviceNo);
         if(device==null||device.getMechId()==null){
             if(device==null){
-                return ttSocketDto.fail("设备不存在！");
+                return ttSocketDto.fail(TTScoketConstants.CODE_UNATIVE,"设备不存在！");
             }
         }
         JSONObject data = (JSONObject) ttSocketDto.getData();
@@ -132,7 +132,7 @@ public class TtSocketService {
             return ttSocketDto.fail("要关注对象状态为空！");
         }
         Integer noticeFlag = Integer.parseInt(status);
-        String noticeNo = userInfo.getUserId();
+        String noticeNo = followInfo.getUserId();
         Notice notice = noticeMapper.selectNoticeForFollow(device.getMechId(),
                 ttSocketDto.getPackageName(),noticeNo);
         String dateStr = DateUtils.dateTime();
@@ -141,6 +141,9 @@ public class TtSocketService {
         if(notice==null){
             notice = new Notice();
             notice.setNoticeNo(noticeNo);
+            notice.setOwnId(device.getMechOwn());
+            notice.setOwnNo(userInfo.getUserId());
+            notice.setOwnName(userInfo.getUserName());
             notice.setNoticeFlag(noticeFlag);
             notice.setDeviceId(device.getDeviceId());
             notice.setMechantId(device.getMechId());
@@ -162,9 +165,8 @@ public class TtSocketService {
             notice.setNoticeLocation(followInfo.getLocation());
             notice.setNoticeImgRul(followInfo.getImageUrl());
             noticeMapper.updateNotice(notice);
-
         }else{
-            return ttSocketDto.fail("关注状态异常！");
+            return ttSocketDto.ok("关注状态异常！");
         }
         this.updateNumForNoticeFlag(noticeFlag, dateStr, key,oldNoticeFllag);
         return ttSocketDto.ok();
@@ -222,7 +224,7 @@ public class TtSocketService {
         Device device = deviceMapper.selectDeviceByDeviceNo(deviceNo);
         if(device==null||device.getMechId()==null){
             if(device==null){
-                return ttSocketDto.fail("设备不存在！");
+                return ttSocketDto.fail(TTScoketConstants.CODE_UNATIVE,"设备不存在！");
             }
         }
         JSONArray datas = (JSONArray) ttSocketDto.getData();
@@ -265,13 +267,16 @@ public class TtSocketService {
         for (Notice notice : notices) {
             maps.put(notice.getNoticeNo(),notice);
         }
-        List<String> res = new ArrayList<>(datas.size());
+        JSONArray ress = new JSONArray();
         for (Object one : datas) {
             JSONObject jo = (JSONObject) one;
             String noticeNo = jo.getString(TTScoketConstants.param_user_id);
             Notice notice = maps.get(noticeNo);
             if(notice==null){
                 notice = new Notice();
+                notice.setOwnId(device.getMechOwn());
+                notice.setOwnNo(userInfo.getUserId());
+                notice.setOwnName(userInfo.getUserName());
                 notice.setNoticeNo(noticeNo);
                 notice.setNoticeFlag(NoticeFlag.apply.val());
                 notice.setDeviceId(device.getDeviceId());
@@ -284,8 +289,11 @@ public class TtSocketService {
                 notice.setCreateTime(new Date());
                 noticeMapper.insertNotice(notice);
                 remainNum--;
-                res.add(noticeNo);
+                ress.add(one);
             }else if(NoticeFlag.free.val().equals(notice.getNoticeFlag())){
+                notice.setOwnId(device.getMechOwn());
+                notice.setOwnNo(userInfo.getUserId());
+                notice.setOwnName(userInfo.getUserName());
                 notice.setDeviceId(device.getDeviceId());
                 notice.setNoticeFlag(NoticeFlag.apply.val());
                 notice.setNoticeName(jo.getString(TTScoketConstants.param_user_name));
@@ -295,7 +303,7 @@ public class TtSocketService {
                 notice.setUpdateTime(new Date());
                 noticeMapper.updateNotice(notice);
                 remainNum--;
-                res.add(noticeNo);
+                ress.add(one);
             }
             if(remainNum==0){
                 break;
@@ -303,12 +311,12 @@ public class TtSocketService {
         }
         //更新正在关注数量
         if(applyNum == null){
-            applyNum = res.size();
+            applyNum = ress.size();
         }else{
-            applyNum+=res.size();
+            applyNum+=ress.size();
         }
         redisCache.setCacheMapValue(dateStr + TTContants.cache_key_tt_day_apply_number,key,applyNum);
-        return ttSocketDto.ok(res.toArray(),"返回成功！");
+        return ttSocketDto.ok(ress,"返回成功！");
     }
 
     @Autowired
@@ -328,7 +336,7 @@ public class TtSocketService {
         Device device = deviceMapper.selectDeviceByDeviceNo(deviceNo);
         if(device==null){
             if(device==null){
-                return ttSocketDto.fail("设备不存在！");
+                return ttSocketDto.fail(TTScoketConstants.CODE_UNATIVE,"设备不存在！");
             }
         }
         Account account = new Account();
@@ -339,10 +347,15 @@ public class TtSocketService {
         if(account==null){
             return ttSocketDto.fail("账号信息不存在！");
         }
+        JSONObject obj = getAppConfig(account);
+        return ttSocketDto.ok(obj,"获取配置信息成功！");
+    }
+
+    public JSONObject getAppConfig(Account account) {
         Follow follow = new Follow();
         Integer remainNum = account.getFollowNumber();
         String dateStr = DateUtils.dateTime();
-        String key = account.getAccountNo()+"@"+account.getMechantId()+"@"+account.getAccountChannel();
+        String key = account.getAccountNo()+"@"+ account.getMechantId()+"@"+ account.getAccountChannel();
         //当天正在关注数量
         Integer applyNum = redisCache.getCacheMapValue(dateStr + TTContants.cache_key_tt_day_apply_number,key);
         if(applyNum!=null){
@@ -355,7 +368,7 @@ public class TtSocketService {
         }
         //设置每日关注数量
         follow.setNumber(remainNum);
-        follow.setNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SEX)));
+        follow.setSex(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SEX)));
         follow.setMinAge(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINAGE)));
         follow.setMaxAge(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXAGE)));
         follow.setMinSpeed(Long.parseLong(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINSPEED)));
@@ -369,7 +382,7 @@ public class TtSocketService {
         match.setComment(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_COMMENT));
         JSONObject obj = new JSONObject();
         obj.put("follow",follow);
-        return ttSocketDto.ok(obj,"获取配置信息成功！");
+        return obj;
     }
 
 
@@ -414,6 +427,7 @@ public class TtSocketService {
         Account dataAccount = accountMapper.selectAccount(account);
         if(dataAccount==null){
             account.setDeviceId(device.getDeviceId());
+            account.setOwnId(device.getMechOwn());
             account.setAccountName(userInfo.getUserName());
             account.setAccountImgUrl(userInfo.getImageUrl());
             account.setAccountStatus(AccountStatus.LOGIN.val());
@@ -421,6 +435,7 @@ public class TtSocketService {
             accountMapper.insertAccount(account);
         }else{
             dataAccount.setDeviceId(device.getDeviceId());
+            account.setOwnId(device.getMechOwn());
             dataAccount.setAccountName(userInfo.getUserName());
             account.setAccountImgUrl(userInfo.getImageUrl());
             account.setAccountStatus(AccountStatus.LOGIN.val());
@@ -445,15 +460,15 @@ public class TtSocketService {
         }
         Device device = deviceMapper.selectDeviceByDeviceNo(deviceNo);
         if(device==null){
-            return ttSocketDto.fail("设备不存在！");
+            return ttSocketDto.fail(TTScoketConstants.CODE_UNATIVE,"设备不存在！");
         }
         if(YesOrNoStatus.NO.equals(device.getDeviceStatus())){
             ttSocketDto.setMsg("设备编码为空!");
-            return ttSocketDto.fail("设备已被禁用！");
+            return ttSocketDto.fail(TTScoketConstants.CODE_UNATIVE,"设备已被禁用！");
         }
         if(!DateUtils.ifNowBetween(device.getDeviceStartTime(),device.getDeviceEndTime())){
             ttSocketDto.setMsg("设备编码为空!");
-            return ttSocketDto.fail("设备到期或未激活！");
+            return ttSocketDto.fail(TTScoketConstants.CODE_UNATIVE,"设备到期或未激活！");
         }
         Mechant mechant = mechantMapper.selectMechantByMechId(device.getMechId());
         if(mechant==null){
@@ -469,14 +484,37 @@ public class TtSocketService {
 //        }
         redisCache.setCacheMapValue(RedisConstants.TT_CHANNEL_DEVICE,ttSocketDto.getChannelId(),ttSocketDto.getAndroidId());
         redisCache.setCacheMapValue(RedisConstants.TT_DEVICE_CHANNEL,ttSocketDto.getAndroidId(),ttSocketDto.getChannelId());
-        return ttSocketDto.ok(ttSocketDto.getChannelId(),"设备连接成功！");
+        return ttSocketDto.ok(ttSocketDto.getChannelId(),TTScoketConstants.CODE_ACTIVE,"设备连接成功！");
     }
     /**
      * 设备断开连接
      * @param ttSocketDto
      * @return
      */
-    private TTSocketDto actionAccountDisconnect(TTSocketDto ttSocketDto) {
+    @Transactional(rollbackFor = Exception.class)
+    public TTSocketDto actionAccountDisconnect(TTSocketDto ttSocketDto) {
+        String deviceNo = ttSocketDto.getAndroidId();
+        if(deviceNo==null){
+            return ttSocketDto.fail("设备编码为空！");
+        }
+        Device device = deviceMapper.selectDeviceByDeviceNo(deviceNo);
+        if(device==null){
+            return ttSocketDto.fail(TTScoketConstants.CODE_UNATIVE,"设备不存在！");
+        }
+        UserInfo userInfo = ttSocketDto.getUserInfo();
+        if(userInfo ==null){
+            return ttSocketDto.fail("账号信息为空!");
+        }
+        Account account = new Account();
+        account.setMechantId(device.getMechId());
+        account.setAccountChannel(ttSocketDto.getPackageName());
+        account.setAccountNo(userInfo.getUserId());
+        account = accountMapper.selectAccount(account);
+        if(account==null){
+            return ttSocketDto.fail("账号信息不存在！");
+        }
+        account.setAccountStatus(AccountStatus.UNLOGIN.val());
+        accountMapper.updateAccount(account);
         return ttSocketDto.ok();
     }
 

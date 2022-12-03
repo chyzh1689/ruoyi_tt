@@ -1,7 +1,19 @@
 package com.ruoyi.tt.service.impl;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
+import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.common.constant.RedisConstants;
+import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.tt.domain.Device;
+import com.ruoyi.tt.mapper.DeviceMapper;
+import com.ruoyi.tt.third.SocketServerHandler;
+import com.ruoyi.tt.third.TTScoketConstants;
+import com.ruoyi.tt.third.TTSocketDto;
+import com.ruoyi.tt.third.TtSocketService;
+import io.netty.channel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.tt.mapper.AccountMapper;
@@ -58,6 +70,12 @@ public class AccountServiceImpl implements IAccountService
         return accountMapper.insertAccount(account);
     }
 
+    @Autowired
+    private RedisCache redisCache;
+    @Autowired
+    private DeviceMapper deviceMapper;
+    @Autowired
+    private TtSocketService ttSocketService;
     /**
      * 修改账号信息
      * 
@@ -65,10 +83,35 @@ public class AccountServiceImpl implements IAccountService
      * @return 结果
      */
     @Override
-    public int updateAccount(Account account)
-    {
+    public int updateAccount(Account account){
         account.setUpdateTime(DateUtils.getNowDate());
-        return accountMapper.updateAccount(account);
+        Account dataAccount = accountMapper.selectAccountByAccountId(account.getAccountId());
+        int count = accountMapper.updateAccount(account);
+        if(dataAccount!=null && account.getFollowNumber()!=null &&
+                !account.getFollowNumber().equals(dataAccount.getFollowNumber())){
+            account.setAccountChannel(dataAccount.getAccountChannel());
+            account.setMechantId(dataAccount.getMechantId());
+            Device device = deviceMapper.selectDeviceByDeviceId(dataAccount.getDeviceId());
+            if(device!=null){
+                String  channelId = redisCache.getCacheMapValue(RedisConstants.TT_DEVICE_CHANNEL,
+                        device.getDeviceNo());
+                if(channelId==null){
+                    return count;
+                }
+                Channel channel = SocketServerHandler.getChannelMap().get(channelId);
+                if(channel!=null){
+                    JSONObject appConfig = ttSocketService.getAppConfig(account);
+                    TTSocketDto ttSocketDto = new TTSocketDto();
+                    ttSocketDto.setAction(TTScoketConstants.ACTION_APP_CONFIG);
+                    ttSocketDto.setPackageName(TTScoketConstants.getChannelMap().get(account.getAccountChannel()));
+                    ttSocketDto.setAndroidId(device.getDeviceNo());
+                    ttSocketDto.setData(appConfig);
+                    channel.writeAndFlush(JSONObject.toJSONString(ttSocketDto));
+                }
+
+            }
+        }
+        return count;
     }
 
     /**

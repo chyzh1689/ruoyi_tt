@@ -36,6 +36,10 @@ public class TTSocketDto<T> {
         return restResult(data, SUCCESS, msg);
     }
 
+    public TTSocketDto<T> ok(T data,int code, String msg)    {
+        return restResult(data, code, msg);
+    }
+
     public TTSocketDto<T> fail()
     {
         return restResult(null, FAIL, "操作失败");

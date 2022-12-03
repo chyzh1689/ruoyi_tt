@@ -8,6 +8,8 @@ import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.utils.ShiroUtils;
+import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.tt.TTContants;
 import com.ruoyi.tt.domain.Mechant;
 import com.ruoyi.tt.service.IMechantService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -43,6 +45,8 @@ public class DeviceController extends BaseController{
     private IDeviceService deviceService;
     @Autowired
     private IMechantService mechantService;
+    @Autowired
+    private ISysConfigService configService;
     @RequiresPermissions("tt:device:view")
     @GetMapping()
     public String device()
@@ -94,6 +98,17 @@ public class DeviceController extends BaseController{
                 }
             }
         }
+        device.setFollowNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NUMBER)));
+        device.setFollowSex(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SEX)));
+        device.setFollowMinAge(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINAGE)));
+        device.setFollowMaxAge(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXAGE)));
+        device.setFollowMinSpeed(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINSPEED)));
+        device.setFollowMaxSpeed(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXSPEED)));
+        device.setFollowSleepTime(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SLEEPTIME)));
+        device.setFollowSleepCount(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SLEEPCOUNT)));
+        device.setFollowMatchNickname(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NICKNAME));
+        device.setFollowMatchSignature(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SIGNATURE));
+        device.setFollowMatchComment(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_COMMENT));
         mmap.put("device", device);
         return prefix + "/add";
     }

@@ -5,7 +5,7 @@
 </head>
 <body class="white-bg">
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
-        <form class="form-horizontal m" id="form-device-add">
+        <form class="form-horizontal m" id="form-device-add" th:object="${device}">
             <input name="mechOwn" type="hidden" id="mechOwn"/>
             <div class="form-group">
                 <label class="col-sm-2 control-label">所属者：</label>
@@ -35,13 +35,65 @@
                         <span></span>
                     </label>
                 </div>
+                <label class="col-sm-2 control-label">设备激活日期： </label>
+                <div class="col-sm-4">
+                    <input style="display:inline-block;width: 100px" class="form-control time-input" id="startTime" placeholder="开始日期" name="deviceStartTime"/>
+                    <span>-</span>
+                    <input style="display:inline-block;width: 100px" class="form-control time-input" id="endTime" placeholder="结束日期" name="deviceEndTime"/>
+                </div>
             </div>
             <div class="form-group">
-                <label class="col-sm-2 control-label">设备激活日期： </label>
-                <div class="col-sm-10">
-                    <input style="display:inline-block;width: 120px" class="form-control time-input" id="startTime" placeholder="开始日期" name="deviceStartTime"/>
+                <label class="col-sm-2 control-label">每日关注数量：</label>
+                <div class="col-sm-4">
+                    <input name="followNumber" th:value="${device.followNumber}" class="form-control" type="number" maxlength="8" required>
+                </div>
+                <label class="col-sm-2 control-label">关注速度(秒)：</label>
+                <div class="col-sm-4">
+                    <input name="followMinSpeed" style="display:inline-block;width: 100px" th:value="${device.followMinSpeed}" class="form-control" type="number" maxlength="8" required>
                     <span>-</span>
-                    <input style="display:inline-block;width: 120px" class="form-control time-input" id="endTime" placeholder="结束日期" name="deviceEndTime"/>
+                    <input name="followMaxSpeed" style="display:inline-block;width: 100px" th:value="${device.followMaxSpeed}" class="form-control" type="number" maxlength="8" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">休眠需关注数：</label>
+                <div class="col-sm-4">
+                    <input name="followSleepCount" th:value="${device.followSleepCount}" class="form-control" type="number" maxlength="8" required>
+                </div>
+                <label class="col-sm-2 control-label">休眠时间(秒)：</label>
+                <div class="col-sm-4">
+                    <input name="followSleepTime" th:value="${device.followSleepTime}" class="form-control" type="number" maxlength="8" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">关注性别：</label>
+                <div class="col-sm-4">
+                    <select name="followSex" class="form-control m-b" th:with="type=${@dict.getType('sys_user_sex')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{followSex}"></option>
+                    </select>
+                </div>
+                <label class="col-sm-2 control-label">关注年龄：</label>
+                <div class="col-sm-4">
+                    <input name="followMinAge" style="display:inline-block;width: 100px" th:value="${device.followMinAge}" class="form-control" type="number" required>
+                    <span>-</span>
+                    <input name="followMaxAge" style="display:inline-block;width: 100px" th:value="${device.followMaxAge}" class="form-control" type="number" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">匹配昵称(,分隔)：</label>
+                <div class="col-sm-8">
+                    <input name="followMatchNickname" th:value="${device.followMatchNickname}" class="form-control" type="text" maxlength="100" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">匹配签名(,分隔)：</label>
+                <div class="col-sm-8">
+                    <input name="followMatchSignature" th:value="${device.followMatchSignature}" class="form-control" type="text" maxlength="100" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">匹配评论(,分隔)：</label>
+                <div class="col-sm-8">
+                    <input name="followMatchComment" th:value="${device.followMatchComment}" class="form-control" type="text" maxlength="100" required>
                 </div>
             </div>
         </form>

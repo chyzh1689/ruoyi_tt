@@ -2,9 +2,12 @@ package com.ruoyi.tt.service.impl;
 
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.tt.TTContants;
 import com.ruoyi.tt.domain.Mechant;
 import com.ruoyi.tt.enums.MechType;
 import com.ruoyi.tt.mapper.MechantMapper;
+import com.ruoyi.tt.third.Match;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.tt.mapper.DeviceMapper;
@@ -19,12 +22,13 @@ import com.ruoyi.common.core.text.Convert;
  * @date 2022-10-22
  */
 @Service
-public class DeviceServiceImpl implements IDeviceService 
-{
+public class DeviceServiceImpl implements IDeviceService {
     @Autowired
     private DeviceMapper deviceMapper;
     @Autowired
     private MechantMapper mechantMapper;
+    @Autowired
+    private ISysConfigService configService;
     /**
      * 查询设备信息
      * 
@@ -65,6 +69,7 @@ public class DeviceServiceImpl implements IDeviceService
                 device.setMechId(mechant.getParentId());
             }
         }
+
         return deviceMapper.insertDevice(device);
     }
 

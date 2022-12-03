@@ -52,5 +52,8 @@ public class TTScoketConstants {
     public static final String param_image_url = "imageUrl";
     public static final String param_status = "status";
 
+    public static final Integer CODE_UNATIVE = 400;
+
+    public static final Integer CODE_ACTIVE = 200;
 
 }

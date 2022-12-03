@@ -1,6 +1,12 @@
 package com.ruoyi.tt.controller;
 
 import java.util.List;
+
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.common.enums.UserType;
+import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.tt.TTContants;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -40,16 +46,42 @@ public class AccountController extends BaseController{
         return prefix + "/account";
     }
 
+    @Autowired
+    private RedisCache redisCache;
+
     /**
      * 查询账号信息列表
      */
     @RequiresPermissions("tt:account:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(Account account)
-    {
+    public TableDataInfo list(Account account)    {
+        SysUser sysUser = getSysUser();
+        if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
+            if(UserType.MECH.val().equals(sysUser.getUserType())){
+                account.setMechantId(sysUser.getUserId());
+            }
+        }
         startPage();
         List<Account> list = accountService.selectAccountList(account);
+        for (Account acount : list) {
+            String dateStr = DateUtils.dateTime();
+            String key = account.getAccountNo()+"@"+account.getMechantId()+"@"+account.getAccountChannel();
+            //当天正在关注数量
+            Integer applyNum = redisCache.getCacheMapValue(dateStr + TTContants.cache_key_tt_day_apply_number,key);
+            if(applyNum!=null){
+                account.setDayApplyNum(applyNum);
+            }else{
+                account.setDayApplyNum(0);
+            }
+            //当天关注成功数量
+            Integer followNum = redisCache.getCacheMapValue(dateStr + TTContants.cache_key_tt_day_follow_number,key);
+            if(followNum!=null){
+                account.setDayFollowNum(followNum);
+            }else{
+                account.setFollowNumber(0);
+            }
+        }
         return getDataTable(list);
     }
 
@@ -60,8 +92,15 @@ public class AccountController extends BaseController{
     @Log(title = "账号信息", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(Account account)
-    {
+    public AjaxResult export(Account account)    {
+        SysUser sysUser = getSysUser();
+        if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
+            if(UserType.MECH.val().equals(sysUser.getUserType())){
+                account.setMechantId(sysUser.getUserId());
+            }else if(UserType.EMPL.val().equals(sysUser.getUserType())){
+                account.setOwnId(sysUser.getUserId());
+            }
+        }
         List<Account> list = accountService.selectAccountList(account);
         ExcelUtil<Account> util = new ExcelUtil<Account>(Account.class);
         return util.exportExcel(list, "账号信息数据");
@@ -107,8 +146,7 @@ public class AccountController extends BaseController{
     @Log(title = "账号信息", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(Account account)
-    {
+    public AjaxResult editSave(Account account)  {
         return toAjax(accountService.updateAccount(account));
     }
 

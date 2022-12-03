@@ -39,8 +39,8 @@ public class NoticeServiceImpl implements INoticeService {
      * @return 关注信息
      */
     @Override
-    public List<Notice> selectNoticeList(Notice notice)
-    {
+    public List<Notice> selectNoticeList(Notice notice)    {
+
         return noticeMapper.selectNoticeList(notice);
     }
 

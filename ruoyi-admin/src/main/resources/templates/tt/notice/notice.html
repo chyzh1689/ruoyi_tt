@@ -107,7 +107,12 @@
                 },
                 {
                     field: 'noticeImgRul',
-                    title: '粉丝头像'
+                    title: '粉丝头像',
+                    visible: false,
+                    formatter: function (value){
+                        return "<div style=\"width: 100%;text-align: left\" title='点我查看大图' onclick='showImg(\""+value+"\")'>" +
+                            "<img  height='27'  src='" + value + "'></div>";
+                    }
                 },
                 {
                     field: 'noticeLocation',
@@ -119,6 +124,11 @@
                     formatter: function(value, row) {
                         return $.table.selectDictLabel(noticeFlags, row.noticeFlag);
                     }
+                },
+                {
+                    field: 'createTime',
+                    title: '创建时间',
+                    sortable: true
                 },
                 {
                     title: '操作',
@@ -133,6 +143,28 @@
             };
             $.table.init(options);
         });
+        function showImg(path){
+            var img=new Image();
+            img.src = path;
+            img.onload= function(){
+                var height = img.height;
+                if(height > 400){
+                    height = 400;
+                }
+                var width = img.width * (height/img.height);
+                layer.open({
+                    type: 1,
+                    maxmin:true,
+                    shade: false,
+                    title: false, //不显示标题
+                    area: [width + 'px', height+'px'],
+                    content: "<img height='100%' src='" + path + "' />", //捕获的元素，注意：最好该指定的元素要存放在body最外层，否则可能被其它的相对元素所影响
+                    cancel: function () {
+                        //layer.msg('图片查看结束！', { time: 5000, icon: 6 });
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>

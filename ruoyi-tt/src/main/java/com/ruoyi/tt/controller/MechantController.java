@@ -75,8 +75,11 @@ public class MechantController extends BaseController
     @Log(title = "商户信息", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(Mechant mechant)
-    {
+    public AjaxResult export(Mechant mechant)    {
+        SysUser sysUser = getSysUser();
+        if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
+            mechant.setMechId(sysUser.getUserId());
+        }
         List<Mechant> list = mechantService.selectMechantList(mechant);
         ExcelUtil<Mechant> util = new ExcelUtil<Mechant>(Mechant.class);
         return util.exportExcel(list, "商户信息数据");

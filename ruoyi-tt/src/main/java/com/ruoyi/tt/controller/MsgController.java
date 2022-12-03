@@ -1,6 +1,9 @@
 package com.ruoyi.tt.controller;
 
 import java.util.List;
+
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.enums.UserType;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,8 +50,15 @@ public class MsgController extends BaseController
     @RequiresPermissions("tt:msg:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(Msg msg)
-    {
+    public TableDataInfo list(Msg msg)    {
+        SysUser sysUser = getSysUser();
+        if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
+            if(UserType.MECH.val().equals(sysUser.getUserType())){
+                msg.setMechId(sysUser.getUserId());
+            }else if(UserType.EMPL.val().equals(sysUser.getUserType())){
+                msg.setOwnId(sysUser.getUserId());
+            }
+        }
         startPage();
         List<Msg> list = msgService.selectMsgList(msg);
         return getDataTable(list);
@@ -61,8 +71,15 @@ public class MsgController extends BaseController
     @Log(title = "消息聊天记录", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(Msg msg)
-    {
+    public AjaxResult export(Msg msg)    {
+        SysUser sysUser = getSysUser();
+        if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
+            if(UserType.MECH.val().equals(sysUser.getUserType())){
+                msg.setMechId(sysUser.getUserId());
+            }else if(UserType.EMPL.val().equals(sysUser.getUserType())){
+                msg.setOwnId(sysUser.getUserId());
+            }
+        }
         List<Msg> list = msgService.selectMsgList(msg);
         ExcelUtil<Msg> util = new ExcelUtil<Msg>(Msg.class);
         return util.exportExcel(list, "消息聊天记录数据");

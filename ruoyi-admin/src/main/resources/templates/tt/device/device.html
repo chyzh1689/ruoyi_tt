@@ -64,7 +64,8 @@
         var editFlag = [[${@permission.hasPermi('tt:device:edit')}]];
         var removeFlag = [[${@permission.hasPermi('tt:device:remove')}]];
         var prefix = ctx + "tt/device";
-
+        var sexs = [[${@dict.getType('sys_user_sex')}]];
+        var datas = [];
         $(function() {
             var options = {
                 url: prefix + "/list",
@@ -116,9 +117,63 @@
                     }
                 },
                 {
-                    field: 'createTime',
-                    title: '创建时间',
+                    field: 'followNumber',
+                    title: '每日关注数',
                     sortable: true
+                },
+                {
+                    field: 'followMinSpeed',
+                    title: '关注速度（秒）',
+                    formatter: function (value, row, index) {
+                        return (row.followMinSpeed?row.followMinSpeed:"")+" - " +
+                            (row.followMaxSpeed?row.followMaxSpeed:"");
+                    }
+                },
+                {
+                    field: 'followSleepCount',
+                    title: '休眠需关注数',
+                },
+                {
+                    field: 'followSleepTime',
+                    title: '休眠时间',
+                },
+                {
+                    field: 'followSex',
+                    title: '关注性别',
+                    formatter: function(value, row) {
+                        return $.table.selectDictLabel(sexs, value);
+                    }
+                },
+                {
+                    field: 'followMinAge',
+                    title: '关注年龄',
+                    formatter: function (value, row, index) {
+                        return (row.followMinAge?row.followMinAge:"")+" - " +
+                            (row.followMaxAge?row.followMaxAge:"");
+                    }
+                },
+                {
+                    field: 'followMatchNickname',
+                    title: '匹配信息',
+                    formatter: function (value,row,index){
+                        datas[index] = row;
+                        return "<a onclick='matchDetail(\""+index+"\")' >看详情</a>";
+                    }
+                },
+                {
+                    field: 'followMatchNickname',
+                    title: '匹配昵称',
+                    visible: false
+                },
+                {
+                    field: 'followMatchSignature',
+                    title: '匹配签名',
+                    visible: false
+                },
+                {
+                    field: 'followMatchComment',
+                    title: '匹配评论',
+                    visible: false
                 },
                 {
                     title: '操作',
@@ -154,6 +209,25 @@
             $.modal.confirm("确认要启用该设备吗？", function() {
                 $.operate.post(prefix + "/changeStatus", { "deviceId": roleId, "deviceStatus": 0 });
             })
+        }
+        function matchDetail(index){
+            let content = '<table class="table table-bordered">';
+            content += '<tr style="border-top: 2px solid #000">';
+            content += '<td style="text-align: right" width="115">匹配昵称(,分隔):</td><td>' + datas[index].followMatchNickname +'</td></tr>';
+            content += '<tr><td style="text-align: right" width="115">匹配签名(,分隔):</td><td>' + datas[index].followMatchSignature + '</td></tr>';
+            content += '<tr><td style="text-align: right" width="115">匹配评论(,分隔):</td><td>' + datas[index].followMatchComment + '</td></tr>';
+            content +='</table>';
+            layer.open({
+                type:1,
+                title : "设备：" + datas[index].deviceName + ' 匹配详情信息',
+                shadeClose : false, // 点击遮罩关闭层
+                area : [ '750px', '500px' ],
+                content : content,
+                cancel: function(){
+                    layer.close();
+                },
+                btn: ['确定']//按钮
+            });
         }
     </script>
 </body>

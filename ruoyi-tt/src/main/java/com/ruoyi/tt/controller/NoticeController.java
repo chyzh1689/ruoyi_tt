@@ -1,6 +1,9 @@
 package com.ruoyi.tt.controller;
 
 import java.util.List;
+
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.enums.UserType;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,8 +50,15 @@ public class NoticeController extends BaseController
     @RequiresPermissions("tt:notice:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(Notice notice)
-    {
+    public TableDataInfo list(Notice notice)    {
+        SysUser sysUser = getSysUser();
+        if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
+            if(UserType.MECH.val().equals(sysUser.getUserType())){
+                notice.setMechantId(sysUser.getUserId());
+            }else if(UserType.EMPL.val().equals(sysUser.getUserType())){
+                notice.setOwnId(sysUser.getUserId());
+            }
+        }
         startPage();
         List<Notice> list = noticeService.selectNoticeList(notice);
         return getDataTable(list);
@@ -61,8 +71,15 @@ public class NoticeController extends BaseController
     @Log(title = "关注信息", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(Notice notice)
-    {
+    public AjaxResult export(Notice notice)    {
+        SysUser sysUser = getSysUser();
+        if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
+            if(UserType.MECH.val().equals(sysUser.getUserType())){
+                notice.setMechantId(sysUser.getUserId());
+            }else if(UserType.EMPL.val().equals(sysUser.getUserType())){
+                notice.setOwnId(sysUser.getUserId());
+            }
+        }
         List<Notice> list = noticeService.selectNoticeList(notice);
         ExcelUtil<Notice> util = new ExcelUtil<Notice>(Notice.class);
         return util.exportExcel(list, "关注信息数据");

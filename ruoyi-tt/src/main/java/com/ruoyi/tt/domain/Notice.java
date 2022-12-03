@@ -57,6 +57,10 @@ public class Notice extends BaseEntity{
     @Excel(name = "设备id")
     private Long deviceId;
 
+    /** 所属员工id */
+    @Excel(name = "所属员工id")
+    private Long ownId;
+
     private String deviceShow;
 
     private String mechShow;
