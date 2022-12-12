@@ -18,6 +18,13 @@
                                 </select>
                             </li>
                             <li>
+                                <label>来源渠道：</label>
+                                <select name="accountChannel" th:with="type=${@dict.getType('tt_channel_package')}">
+                                    <option value="">所有</option>
+                                    <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+                                </select>
+                            </li>
+                            <li>
                                 <label>账号：</label>
                                 <input type="text" name="accountNo"/>
                             </li>

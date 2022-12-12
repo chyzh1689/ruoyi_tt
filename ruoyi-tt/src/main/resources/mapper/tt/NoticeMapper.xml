@@ -41,7 +41,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="noticeNo != null  and noticeNo != ''"> and (notice_name like concat('%', #{noticeNo}, '%') or notice_no=#{noticeNo})</if>
             <if test="noticeImgRul != null  and noticeImgRul != ''"> and notice_img_rul = #{noticeImgRul}</if>
             <if test="noticeLocation != null  and noticeLocation != ''"> and notice_location = #{noticeLocation}</if>
-            <if test="channelPackage != null "> and channel_package = #{channelPackage}</if>
+            <if test="channelPackage != null and channelPackage != ''"> and channel_package = #{channelPackage}</if>
             <if test="noticeFlag != null "> and notice_flag = #{noticeFlag}</if>
             <if test="ownNo != null  and ownNo != ''"> and( own_no = #{ownNo} or own_name like concat('%', #{ownNo}, '%'))</if>
             <if test="ownName != null  and ownName != ''"> and own_id in (select mech_id from tt_mechant where mech_no =  #{ownName} or mech_name like concat('%', #{ownName}, '%'))</if>
