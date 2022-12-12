@@ -65,4 +65,5 @@ public class Notice extends BaseEntity{
 
     private String mechShow;
 
+    private String empShow;
 }

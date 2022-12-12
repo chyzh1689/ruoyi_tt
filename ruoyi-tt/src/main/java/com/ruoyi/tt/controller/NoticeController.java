@@ -1,9 +1,14 @@
 package com.ruoyi.tt.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.page.TableSupport;
 import com.ruoyi.common.enums.UserType;
+import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -21,6 +26,8 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.poi.ExcelUtil;
 import com.ruoyi.common.core.page.TableDataInfo;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 关注信息Controller
@@ -58,6 +65,12 @@ public class NoticeController extends BaseController
             }else if(UserType.EMPL.val().equals(sysUser.getUserType())){
                 notice.setOwnId(sysUser.getUserId());
             }
+        }
+        HttpServletRequest request = ServletUtils.getRequest();
+        String orderByCol = request.getParameter(TableSupport.ORDER_BY_COLUMN);
+        if(StringUtils.isEmpty(orderByCol)){
+            request.setAttribute(TableSupport.ORDER_BY_COLUMN,"updateTime");
+            request.setAttribute(TableSupport.IS_ASC,"desc");
         }
         startPage();
         List<Notice> list = noticeService.selectNoticeList(notice);

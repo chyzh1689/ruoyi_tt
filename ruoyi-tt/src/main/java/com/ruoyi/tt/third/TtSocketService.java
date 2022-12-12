@@ -150,6 +150,7 @@ public class TtSocketService {
             notice.setChannelPackage(ttSocketDto.getPackageName());
             notice.setCreateBy("admin");
             notice.setCreateTime(new Date());
+            notice.setUpdateTime(notice.getCreateTime());
             notice.setNoticeName(followInfo.getUserName());
             notice.setNoticeLocation(followInfo.getLocation());
             notice.setNoticeImgRul(followInfo.getImageUrl());

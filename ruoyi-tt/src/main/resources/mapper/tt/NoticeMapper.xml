@@ -8,6 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="noticeNo"    column="notice_no"    />
         <result property="mechantId"    column="mechant_id"    />
         <result property="mechShow"  column="mech_show"    />
+        <result property="empShow"  column="emp_show"    />
         <result property="deviceId"    column="device_id"    />
         <result property="ownId"    column="own_id"></result>
         <result property="deviceShow"    column="device_show"    />
@@ -28,6 +29,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <sql id="selectNoticeVo">
         select notice_no,channel_package,
                mechant_id,(select mech.mech_name from tt_mechant  mech where mech.mech_id = noti.mechant_id) mech_show,
+               (select mech.mech_name from tt_mechant  mech where mech.mech_id = noti.own_id) emp_show,
                device_id, (select devi.device_name from tt_device  devi where devi.device_id = noti.device_id) device_show,
                mechant_id,own_id,
                notice_name, notice_img_rul, notice_location, notice_flag, own_no, own_name, own_img_url,  create_by, create_time, update_by, update_time from tt_notice noti
@@ -36,18 +38,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectNoticeList" parameterType="Notice" resultMap="NoticeResult">
         <include refid="selectNoticeVo"/>
         <where>  
-            <if test="noticeName != null  and noticeName != ''"> and notice_name like concat('%', #{noticeName}, '%')</if>
+            <if test="noticeNo != null  and noticeNo != ''"> and (notice_name like concat('%', #{noticeNo}, '%') or notice_no=#{noticeNo})</if>
             <if test="noticeImgRul != null  and noticeImgRul != ''"> and notice_img_rul = #{noticeImgRul}</if>
             <if test="noticeLocation != null  and noticeLocation != ''"> and notice_location = #{noticeLocation}</if>
             <if test="channelPackage != null "> and channel_package = #{channelPackage}</if>
             <if test="noticeFlag != null "> and notice_flag = #{noticeFlag}</if>
-            <if test="ownNo != null  and ownNo != ''"> and own_no = #{ownNo}</if>
-            <if test="ownName != null  and ownName != ''"> and own_name like concat('%', #{ownName}, '%')</if>
+            <if test="ownNo != null  and ownNo != ''"> and( own_no = #{ownNo} or own_name like concat('%', #{ownNo}, '%'))</if>
+            <if test="ownName != null  and ownName != ''"> and own_id in (select mech_id from tt_mechant where mech_no =  #{ownName} or mech_name like concat('%', #{ownName}, '%'))</if>
             <if test="ownImgUrl != null  and ownImgUrl != ''"> and own_img_url = #{ownImgUrl}</if>
             <if test="mechantId != null "> and mechant_id = #{mechantId}</if>
             <if test="deviceId != null "> and device_id = #{deviceId}</if>
             <if test="ownId != null "> and own_id = #{ownId}</if>
         </where>
+        order by update_time desc
     </select>
     
     <select id="selectNoticeByNoticeNo" parameterType="String" resultMap="NoticeResult">

@@ -11,16 +11,27 @@
                     <div class="select-list">
                         <ul>
                             <li>
+                                <label>所属商户：</label>
+                                <select name="mechantId" th:with="type=${@tt.getMechs()}">
+                                    <option value="">所有</option>
+                                    <option th:each="mech : ${type}" th:text="${mech.mechName}" th:value="${mech.mechId}"></option>
+                                </select>
+                            </li>
+                            <li>
+                                <label>所属员工：</label>
+                                <input type="text" name="ownName"/>
+                            </li>
+                            <li>
                                 <label>所属账号：</label>
                                 <input type="text" name="ownNo"/>
                             </li>
                             <li>
                                 <label>粉丝账号：</label>
-                                <input type="text" name="noticeName"/>
+                                <input type="text" name="noticeNo"/>
                             </li>
                             <li>
                                 <label>关注状态：</label>
-                                <select name="mechType" th:with="type=${@dict.getType('tt_notice_flag')}">
+                                <select name="noticeFlag" th:with="type=${@dict.getType('tt_notice_flag')}">
                                     <option value="">所有</option>
                                     <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
                                 </select>
@@ -76,6 +87,10 @@
                 {
                     field: 'mechShow',
                     title: '所属商户',
+                },
+                {
+                    field: 'empShow',
+                    title: '所属员工',
                 },
                 {
                     field: 'deviceShow',

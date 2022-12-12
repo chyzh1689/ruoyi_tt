@@ -2,6 +2,7 @@ package com.ruoyi.common.core.page;
 
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.utils.ServletUtils;
+import com.ruoyi.common.utils.StringUtils;
 
 /**
  * 表格数据处理
@@ -45,6 +46,10 @@ public class TableSupport
         pageDomain.setPageSize(Convert.toInt(ServletUtils.getParameter(PAGE_SIZE), 10));
         pageDomain.setOrderByColumn(ServletUtils.getParameter(ORDER_BY_COLUMN));
         pageDomain.setIsAsc(ServletUtils.getParameter(IS_ASC));
+        if(StringUtils.isEmpty(pageDomain.getOrderByColumn())){
+            pageDomain.setOrderByColumn((String) ServletUtils.getRequest().getAttribute(ORDER_BY_COLUMN));
+            pageDomain.setIsAsc((String) ServletUtils.getRequest().getAttribute(IS_ASC));
+        }
         pageDomain.setReasonable(ServletUtils.getParameterToBool(REASONABLE));
         return pageDomain;
     }

@@ -11,6 +11,13 @@
                     <div class="select-list">
                         <ul>
                             <li>
+                                <label>所属商户：</label>
+                                <select name="mechantId" th:with="type=${@tt.getMechs()}">
+                                    <option value="">所有</option>
+                                    <option th:each="mech : ${type}" th:text="${mech.mechName}" th:value="${mech.mechId}"></option>
+                                </select>
+                            </li>
+                            <li>
                                 <label>账号：</label>
                                 <input type="text" name="accountNo"/>
                             </li>
