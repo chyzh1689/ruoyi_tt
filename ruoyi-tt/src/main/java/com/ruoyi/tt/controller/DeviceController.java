@@ -61,6 +61,14 @@ public class DeviceController extends BaseController{
     @PostMapping("/list")
     @ResponseBody
     public TableDataInfo list(Device device){
+        SysUser sysUser = getSysUser();
+        if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
+            if(UserType.MECH.val().equals(sysUser.getUserType())){
+                device.setMechId(sysUser.getUserId());
+            }else if(UserType.EMPL.val().equals(sysUser.getUserType())){
+                device.setMechOwn(sysUser.getUserId());
+            }
+        }
         startPage();
         List<Device> list = deviceService.selectDeviceList(device);
         return getDataTable(list);
@@ -73,8 +81,15 @@ public class DeviceController extends BaseController{
     @Log(title = "设备信息", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(Device device)
-    {
+    public AjaxResult export(Device device)    {
+        SysUser sysUser = getSysUser();
+        if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
+            if(UserType.MECH.val().equals(sysUser.getUserType())){
+                device.setMechId(sysUser.getUserId());
+            }else if(UserType.EMPL.val().equals(sysUser.getUserType())){
+                device.setMechOwn(sysUser.getUserId());
+            }
+        }
         List<Device> list = deviceService.selectDeviceList(device);
         ExcelUtil<Device> util = new ExcelUtil<Device>(Device.class);
         return util.exportExcel(list, "设备信息数据");

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ruoyi.common.constant.CfgConstants;
+import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.Ztree;
@@ -85,14 +86,18 @@ public class MechantServiceImpl implements IMechantService {
         if(StringUtils.isEmpty(initPassword)){
             initPassword="123456";
         }
+        Long[] roleIds = new Long[1];
         if(mechant.getParentId()==null||mechant.getParentId().equals(TTContants.VAL_PARENT_ID)){
             mechant.setParentId(TTContants.VAL_PARENT_ID);
             mechant.setMechType(MechType.MECH.val());
             user.setUserType(UserType.MECH.val());
+            roleIds[0]=TTContants.VAL_ROLE_MECH_ID;
         }else{
             mechant.setMechType(MechType.EMPL.val());
             user.setUserType(UserType.EMPL.val());
+            roleIds[0]=TTContants.VAL_ROLE_EMPL_ID;
         }
+        user.setRoleIds(roleIds);
         user.setPhonenumber(mechant.getMechPhone());
         user.setSalt(ShiroUtils.randomSalt());
         user.setLoginName(mechant.getMechNo());

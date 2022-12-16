@@ -60,6 +60,8 @@ public class AccountController extends BaseController{
         if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
             if(UserType.MECH.val().equals(sysUser.getUserType())){
                 account.setMechantId(sysUser.getUserId());
+            }else if(UserType.EMPL.val().equals(sysUser.getUserType())){
+                account.setOwnId(sysUser.getUserId());
             }
         }
         startPage();

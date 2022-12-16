@@ -1,66 +1,59 @@
 package com.ruoyi.tt.controller;
 
-import java.util.List;
-
-import com.ruoyi.common.core.domain.entity.SysMenu;
+import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.enums.UserType;
-import com.ruoyi.common.utils.ShiroUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.tt.domain.Device;
+import com.ruoyi.common.utils.poi.ExcelUtil;
+import com.ruoyi.tt.domain.Mechant;
 import com.ruoyi.tt.enums.ChannelPackage;
 import com.ruoyi.tt.enums.MechType;
+import com.ruoyi.tt.service.IMechantService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.tt.domain.Mechant;
-import com.ruoyi.tt.service.IMechantService;
-import com.ruoyi.common.core.controller.BaseController;
-import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.utils.poi.ExcelUtil;
-import com.ruoyi.common.core.page.TableDataInfo;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
- * 商户信息Controller
+ * 员工信息Controller
  * 
  * @author xxxxxx
  * @date 2022-10-22
  */
 @Controller
-@RequestMapping("/tt/mechant")
-public class MechantController extends BaseController
+@RequestMapping("/tt/employee")
+public class EmployeeController extends BaseController
 {
-    private String prefix = "tt/mechant";
+    private String prefix = "tt/employee";
 
     @Autowired
     private IMechantService mechantService;
 
-    @RequiresPermissions("tt:mechant:view")
+    @RequiresPermissions("tt:employee:view")
     @GetMapping()
     public String mechant()
     {
-        return prefix + "/mechant";
+        return prefix + "/employee";
     }
 
     /**
-     * 查询商户信息列表
+     * 查询员工信息列表
      */
-    @RequiresPermissions("tt:mechant:list")
+    @RequiresPermissions("tt:employee:list")
     @PostMapping("/list")
     @ResponseBody
     public TableDataInfo list(Mechant mechant)  {
-        mechant.setMechType(MechType.MECH.val());
+        mechant.setMechType(MechType.EMPL.val());
         SysUser sysUser = getSysUser();
         if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
-            mechant.setMechId(sysUser.getUserId());
+            mechant.setParentId(sysUser.getUserId());
         }
         startPage();
         List<Mechant> list = mechantService.selectMechantList(mechant);
@@ -71,16 +64,16 @@ public class MechantController extends BaseController
     }
 
     /**
-     * 导出商户信息列表
+     * 导出员工信息列表
      */
-    @RequiresPermissions("tt:mechant:export")
+    @RequiresPermissions("tt:employee:export")
     @Log(title = "商户信息", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
     public AjaxResult export(Mechant mechant)    {
         SysUser sysUser = getSysUser();
         if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
-            mechant.setMechId(sysUser.getUserId());
+            mechant.setParentId(sysUser.getUserId());
         }
         List<Mechant> list = mechantService.selectMechantList(mechant);
         ExcelUtil<Mechant> util = new ExcelUtil<Mechant>(Mechant.class);
@@ -88,25 +81,24 @@ public class MechantController extends BaseController
     }
 
     /**
-     * 新增
+     * 新增  管理员 在此处不能 暂不支持 添加员工信息
      */
-    @GetMapping("/add/{parentId}")
-    public String add(@PathVariable("parentId") Long parentId, ModelMap mmap)  {
+    @GetMapping("/add")
+    public String add(ModelMap mmap)  {
         Mechant mechant  = new Mechant();
-        mechant.setParentId(parentId);
-        if (0L != parentId){
-            Mechant mechantData = mechantService.selectMechantByMechId(parentId);
-            mechant.setParMechName(mechantData.getMechName());
+        SysUser sysUser = getSysUser();
+        if(sysUser!=null){
+            mechant.setParentId(sysUser.getUserId());
+            mechant.setParMechName(sysUser.getUserName());
         }
-
         mmap.put("mechant", mechant);
         return prefix + "/add";
     }
 
     /**
-     * 新增保存商户信息
+     * 新增保存员工信息
      */
-    @RequiresPermissions("tt:mechant:add")
+    @RequiresPermissions("tt:employee:add")
     @Log(title = "商户信息", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
@@ -126,7 +118,7 @@ public class MechantController extends BaseController
     /**
      * 修改商户信息
      */
-    @RequiresPermissions("tt:mechant:edit")
+    @RequiresPermissions("tt:employee:edit")
     @GetMapping("/edit/{mechId}")
     public String edit(@PathVariable("mechId") Long mechId, ModelMap mmap)    {
         Mechant mechant = mechantService.selectMechantByMechId(mechId);
@@ -138,7 +130,7 @@ public class MechantController extends BaseController
      * 商户状态修改
      */
     @Log(title = "商户管理", businessType = BusinessType.UPDATE)
-    @RequiresPermissions("tt:mechant:edit")
+    @RequiresPermissions("tt:employee:edit")
     @PostMapping("/changeStatus")
     @ResponseBody
     public AjaxResult changeStatus(Mechant mechant){
@@ -147,7 +139,7 @@ public class MechantController extends BaseController
     /**
      * 修改保存商户信息
      */
-    @RequiresPermissions("tt:mechant:edit")
+    @RequiresPermissions("tt:employee:edit")
     @Log(title = "商户信息", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
@@ -166,12 +158,11 @@ public class MechantController extends BaseController
     /**
      * 删除商户信息
      */
-    @RequiresPermissions("tt:mechant:remove")
+    @RequiresPermissions("tt:employee:remove")
     @Log(title = "商户信息", businessType = BusinessType.DELETE)
     @PostMapping( "/remove")
     @ResponseBody
-    public AjaxResult remove(String ids)
-    {
+    public AjaxResult remove(String ids)    {
         return toAjax(mechantService.deleteMechantByMechIds(ids));
     }
 

@@ -4,6 +4,11 @@ public class TTContants {
 
     public static final Long VAL_PARENT_ID = 0L;
 
+    public static final Long VAL_ROLE_MECH_ID = 100L;
+
+    public static final Long VAL_ROLE_EMPL_ID = 101L;
+
+
     /**app-config配置信息**/
     public static final String CACHE_KEY_TT_FOLLOW_NUMBER = "tt.follow.number";
     public static final String CACHE_KEY_TT_FOLLOW_MINSPEED = "tt.follow.minSpeed";

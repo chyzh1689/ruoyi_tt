@@ -7,7 +7,7 @@
     <div class="wrapper wrapper-content animated fadeInRight ibox-content">
         <form class="form-horizontal m" id="form-mechant-add">
             <input name="parentId" class="form-control" type="hidden" th:value="${mechant.parentId}" >
-            <div class="form-group" th:if="${mechant.parentId!=0}">
+            <div class="form-group" th:if="${mechant.parentId==0}">
                 <label class="col-sm-2 control-label">所属商户：</label>
                 <div class="col-sm-4">
                     <input class="form-control" th:value="${mechant.parMechName}" readonly>
@@ -56,7 +56,7 @@
     </div>
     <th:block th:include="include :: footer" />
     <script th:inline="javascript">
-        var prefix = ctx + "tt/mechant"
+        var prefix = ctx + "tt/employee"
         $("#form-mechant-add").validate({
             focusCleanup: true
         });

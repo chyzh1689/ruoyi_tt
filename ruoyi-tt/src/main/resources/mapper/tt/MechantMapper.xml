@@ -34,6 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectMechantVo"/>
         <where>  
             <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="mechId != null "> and mech_id = #{mechId}</if>
             <if test="mechName != null  and mechName != ''"> and mech_name like concat('%', #{mechName}, '%')</if>
             <if test="mechNo != null  and mechNo != ''"> and mech_no = #{mechNo}</if>
             <if test="mechPhone != null  and mechPhone != ''"> and mech_phone = #{mechPhone}</if>
