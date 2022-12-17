@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.tt.mapper.AppConfigMapper">
+    
+    <resultMap type="AppConfig" id="AppConfigResult">
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceShow"    column="device_show"    />
+        <result property="mechId"    column="mech_id"    />
+        <result property="mechShow"  column="mech_show"    />
+        <result property="channelPackage"    column="channel_package"    />
+        <result property="appConfigCode"    column="app_config_code"    />
+        <result property="appConfigValue"    column="app_config_value"    />
+        <result property="appConfigLabel"    column="app_config_label"    />
+        <result property="appConfigSort"    column="app_config_sort"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectAppConfigVo">
+        select
+               mech_id,(select mech.mech_name from tt_mechant  mech where mech.mech_id = ac.mech_id) mech_show,
+               device_id, (select devi.device_name from tt_device  devi where devi.device_id = ac.device_id) device_show,
+               channel_package, app_config_code, app_config_value, app_config_label, app_config_sort, create_by, create_time, update_by, update_time from tt_app_config ac
+    </sql>
+
+    <select id="selectAppConfigList" parameterType="AppConfig" resultMap="AppConfigResult">
+        <include refid="selectAppConfigVo"/>
+        <where>  
+            <if test="channelPackage != null  and channelPackage != ''"> and channel_package = #{channelPackage}</if>
+            <if test="appConfigCode != null  and appConfigCode != ''"> and app_config_code = #{appConfigCode}</if>
+            <if test="mechId != null "> and mech_id = #{mechId}</if>
+            <if test="deviceId != null "> and device_id = #{deviceId}</if>
+
+        </where>
+        order by app_config_sort asc
+    </select>
+    
+    <select id="selectAppConfigByDeviceId" parameterType="Long" resultMap="AppConfigResult">
+        <include refid="selectAppConfigVo"/>
+        where device_id = #{deviceId}
+    </select>
+    <select id="selectAppConfig" resultMap="AppConfigResult">
+        <include refid="selectAppConfigVo"/>
+        where device_id = #{deviceId} and channel_package = #{channelPackage} and app_config_code = #{appConfigCode}
+    </select>
+
+    <insert id="insertAppConfig" parameterType="AppConfig">
+        insert into tt_app_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceId != null">device_id,</if>
+            <if test="mechId != null">mech_id,</if>
+            <if test="channelPackage != null">channel_package,</if>
+            <if test="appConfigCode != null">app_config_code,</if>
+            <if test="appConfigValue != null">app_config_value,</if>
+            <if test="appConfigLabel != null">app_config_label,</if>
+            <if test="appConfigSort != null">app_config_sort,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="mechId != null">#{mechId},</if>
+            <if test="channelPackage != null">#{channelPackage},</if>
+            <if test="appConfigCode != null">#{appConfigCode},</if>
+            <if test="appConfigValue != null">#{appConfigValue},</if>
+            <if test="appConfigLabel != null">#{appConfigLabel},</if>
+            <if test="appConfigSort != null">#{appConfigSort},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateAppConfig" parameterType="AppConfig">
+        update tt_app_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="appConfigValue != null">app_config_value = #{appConfigValue},</if>
+            <if test="appConfigLabel != null">app_config_label = #{appConfigLabel},</if>
+            <if test="appConfigSort != null">app_config_sort = #{appConfigSort},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where device_id = #{deviceId} and channel_package = #{channelPackage} and app_config_code = #{appConfigCode}
+    </update>
+
+
+    <delete id="deleteAppConfigByDeviceIds" parameterType="Long">
+        delete from tt_app_config where device_id in 
+        <foreach item="deviceId" collection="array" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteAppConfigByDeviceId" parameterType="Long">
+        delete from tt_app_config where device_id = #{deviceId}
+    </delete>
+
+    <delete id="deleteAppConfig" parameterType="AppConfig">
+        delete from tt_app_config where device_id = #{deviceId}  and channel_package = #{channelPackage} and app_config_code = #{appConfigCode}
+    </delete>
+
+</mapper>

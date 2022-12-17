@@ -11,7 +11,8 @@ import java.util.Map;
 public enum ChannelPackage {
     TT(1),
     FB(2),
-    DY(3);
+    DY(3),
+    XHS(4);
     private int val;
     ChannelPackage (Integer val){
         this.val= val;
@@ -21,6 +22,7 @@ public enum ChannelPackage {
         codeMap.put(TT.name(), TT.val());
         codeMap.put(FB.name(), FB.val());
         codeMap.put(DY.name(), DY.val());
+        codeMap.put(XHS.name(), XHS.val());
     }
     public static Map<String, Integer> codeMap(){
         return codeMap;
