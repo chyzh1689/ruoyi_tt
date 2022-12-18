@@ -2,6 +2,8 @@ package com.ruoyi.tt.controller;
 
 import java.util.List;
 
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.enums.UserType;
 import com.ruoyi.tt.TTContants;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +51,14 @@ public class AppConfigController extends BaseController
     @RequiresPermissions("tt:config:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(AppConfig appConfig)
-    {
+    public TableDataInfo list(AppConfig appConfig) {
+        SysUser sysUser = getSysUser();
+        if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
+            appConfig.setMechId(sysUser.getUserId());
+            if(UserType.EMPL.val().equals(sysUser.getUserType())){
+                //appConfig.setMechOwn(sysUser.getUserId());
+            }
+        }
         startPage();
         List<AppConfig> list = appConfigService.selectAppConfigList(appConfig);
         return getDataTable(list);

@@ -106,5 +106,7 @@ public class Device extends BaseEntity{
 
     private String mechName;
     private String mechOwnName;
+    private Integer mechChannel;
+    private String channels;
 
 }

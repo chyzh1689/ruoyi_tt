@@ -8,6 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="deviceId"    column="device_id"    />
         <result property="mechId"    column="mech_id"    />
         <result property="mechName"    column="mech_name"    />
+        <result property="mechChannel"    column="mech_channel"    />
         <result property="mechOwn"    column="mech_own"    />
         <result property="mechOwnName"    column="mech_own_name"    />
         <result property="deviceName"    column="device_name"    />
@@ -21,28 +22,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="createTime"    column="create_time"    />
         <result property="updateBy"    column="update_by"    />
         <result property="updateTime"    column="update_time"    />
-        <result property="followNumber"    column="follow_number"    />
-        <result property="followMinSpeed"    column="follow_min_speed"    />
-        <result property="followMaxSpeed"    column="follow_max_speed"    />
-        <result property="followSleepTime"    column="follow_sleep_time"    />
-        <result property="followSleepCount"    column="follow_sleep_count"    />
-        <result property="followMatchNickname"    column="follow_match_nickname"    />
-        <result property="followMatchSignature"    column="follow_match_signature"    />
-        <result property="followMatchComment"    column="follow_match_comment"    />
-        <result property="followSex"    column="follow_sex"    />
-        <result property="followMinAge"    column="follow_min_age"    />
-        <result property="followMaxAge"    column="follow_max_age"    />
     </resultMap>
 
     <sql id="selectDeviceVo">
         select device_id, mech_id, mech_own,
             (select mech.mech_name from tt_mechant  mech where mech.mech_id = dev.mech_id) mech_name,
+            (select mech.mech_channel from tt_mechant  mech where mech.mech_id = dev.mech_id) mech_channel,
             (select mech.mech_name from tt_mechant  mech where mech.mech_id = dev.mech_own) mech_own_name,
                device_name, device_no, device_status, device_start_time, device_end_time,
-               device_memo1, device_memo2, create_by, create_time, update_by, update_time,
-               follow_number, follow_min_speed, follow_max_speed, follow_sleep_time, follow_sleep_count,
-               follow_match_nickname, follow_match_signature, follow_match_comment, follow_sex,
-               follow_min_age, follow_max_age from tt_device dev
+               device_memo1, device_memo2, create_by, create_time, update_by, update_time from tt_device dev
     </sql>
 
     <select id="selectDeviceList" parameterType="Device" resultMap="DeviceResult">
@@ -57,17 +45,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="deviceEndTime != null "> and device_end_time = #{deviceEndTime}</if>
             <if test="deviceMemo1 != null  and deviceMemo1 != ''"> and device_memo1 = #{deviceMemo1}</if>
             <if test="deviceMemo2 != null  and deviceMemo2 != ''"> and device_memo2 = #{deviceMemo2}</if>
-            <if test="followNumber != null "> and follow_number = #{followNumber}</if>
-            <if test="followMinSpeed != null "> and follow_min_speed = #{followMinSpeed}</if>
-            <if test="followMaxSpeed != null "> and follow_max_speed = #{followMaxSpeed}</if>
-            <if test="followSleepTime != null "> and follow_sleep_time = #{followSleepTime}</if>
-            <if test="followSleepCount != null "> and follow_sleep_count = #{followSleepCount}</if>
-            <if test="followMatchNickname != null  and followMatchNickname != ''"> and follow_match_nickname like concat('%', #{followMatchNickname}, '%')</if>
-            <if test="followMatchSignature != null  and followMatchSignature != ''"> and follow_match_signature = #{followMatchSignature}</if>
-            <if test="followMatchComment != null  and followMatchComment != ''"> and follow_match_comment = #{followMatchComment}</if>
-            <if test="followSex != null "> and follow_sex = #{followSex}</if>
-            <if test="followMinAge != null "> and follow_min_age = #{followMinAge}</if>
-            <if test="followMaxAge != null "> and follow_max_age = #{followMaxAge}</if>
         </where>
     </select>
     
@@ -96,17 +73,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time,</if>
             <if test="updateBy != null">update_by,</if>
             <if test="updateTime != null">update_time,</if>
-            <if test="followNumber != null">follow_number,</if>
-            <if test="followMinSpeed != null">follow_min_speed,</if>
-            <if test="followMaxSpeed != null">follow_max_speed,</if>
-            <if test="followSleepTime != null">follow_sleep_time,</if>
-            <if test="followSleepCount != null">follow_sleep_count,</if>
-            <if test="followMatchNickname != null">follow_match_nickname,</if>
-            <if test="followMatchSignature != null">follow_match_signature,</if>
-            <if test="followMatchComment != null">follow_match_comment,</if>
-            <if test="followSex != null">follow_sex,</if>
-            <if test="followMinAge != null">follow_min_age,</if>
-            <if test="followMaxAge != null">follow_max_age,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="mechId != null">#{mechId},</if>
@@ -122,17 +88,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">#{createTime},</if>
             <if test="updateBy != null">#{updateBy},</if>
             <if test="updateTime != null">#{updateTime},</if>
-            <if test="followNumber != null">#{followNumber},</if>
-            <if test="followMinSpeed != null">#{followMinSpeed},</if>
-            <if test="followMaxSpeed != null">#{followMaxSpeed},</if>
-            <if test="followSleepTime != null">#{followSleepTime},</if>
-            <if test="followSleepCount != null">#{followSleepCount},</if>
-            <if test="followMatchNickname != null">#{followMatchNickname},</if>
-            <if test="followMatchSignature != null">#{followMatchSignature},</if>
-            <if test="followMatchComment != null">#{followMatchComment},</if>
-            <if test="followSex != null">#{followSex},</if>
-            <if test="followMinAge != null">#{followMinAge},</if>
-            <if test="followMaxAge != null">#{followMaxAge},</if>
         </trim>
     </insert>
 
@@ -152,17 +107,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
-            <if test="followNumber != null">follow_number = #{followNumber},</if>
-            <if test="followMinSpeed != null">follow_min_speed = #{followMinSpeed},</if>
-            <if test="followMaxSpeed != null">follow_max_speed = #{followMaxSpeed},</if>
-            <if test="followSleepTime != null">follow_sleep_time = #{followSleepTime},</if>
-            <if test="followSleepCount != null">follow_sleep_count = #{followSleepCount},</if>
-            <if test="followMatchNickname != null">follow_match_nickname = #{followMatchNickname},</if>
-            <if test="followMatchSignature != null">follow_match_signature = #{followMatchSignature},</if>
-            <if test="followMatchComment != null">follow_match_comment = #{followMatchComment},</if>
-            <if test="followSex != null">follow_sex = #{followSex},</if>
-            <if test="followMinAge != null">follow_min_age = #{followMinAge},</if>
-            <if test="followMaxAge != null">follow_max_age = #{followMaxAge},</if>
         </trim>
         where device_id = #{deviceId}
     </update>

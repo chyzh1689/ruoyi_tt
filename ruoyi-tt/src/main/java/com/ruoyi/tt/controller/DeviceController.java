@@ -1,16 +1,18 @@
 package com.ruoyi.tt.controller;
 
+import java.util.Iterator;
 import java.util.List;
 
 import com.ruoyi.common.core.domain.Ztree;
-import com.ruoyi.common.core.domain.entity.SysDept;
-import com.ruoyi.common.core.domain.entity.SysRole;
-import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.entity.*;
 import com.ruoyi.common.enums.UserType;
 import com.ruoyi.common.utils.ShiroUtils;
 import com.ruoyi.system.service.ISysConfigService;
+import com.ruoyi.system.service.ISysDictDataService;
+import com.ruoyi.system.service.ISysDictTypeService;
 import com.ruoyi.tt.TTContants;
 import com.ruoyi.tt.domain.Mechant;
+import com.ruoyi.tt.enums.ChannelPackage;
 import com.ruoyi.tt.service.IMechantService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +73,9 @@ public class DeviceController extends BaseController{
         }
         startPage();
         List<Device> list = deviceService.selectDeviceList(device);
+        for (Device dev : list) {
+            dev.setChannels(ChannelPackage.toChannelStr(dev.getMechChannel()));
+        }
         return getDataTable(list);
     }
 
@@ -113,17 +118,6 @@ public class DeviceController extends BaseController{
                 }
             }
         }
-        device.setFollowNumber(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NUMBER)));
-        device.setFollowSex(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SEX)));
-        device.setFollowMinAge(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINAGE)));
-        device.setFollowMaxAge(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXAGE)));
-        device.setFollowMinSpeed(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MINSPEED)));
-        device.setFollowMaxSpeed(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_MAXSPEED)));
-        device.setFollowSleepTime(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SLEEPTIME)));
-        device.setFollowSleepCount(Integer.parseInt(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SLEEPCOUNT)));
-        device.setFollowMatchNickname(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_NICKNAME));
-        device.setFollowMatchSignature(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_SIGNATURE));
-        device.setFollowMatchComment(configService.selectConfigByKey(TTContants.CACHE_KEY_TT_FOLLOW_COMMENT));
         mmap.put("device", device);
         return prefix + "/add";
     }
@@ -207,5 +201,30 @@ public class DeviceController extends BaseController{
         }
         mmap.put("excludeId", excludeId);
         return prefix + "/mechTree";
+    }
+
+
+    @Autowired
+    private ISysDictTypeService dictTypeService;
+    /**
+     * 查询字典详细
+     */
+    @RequiresPermissions("tt:config:list")
+    @GetMapping("/appConfig/{deviceId}/{channelPackage}")
+    public String appConfig(@PathVariable("deviceId") Long deviceId,
+                            @PathVariable("channelPackage") String channelPackage, ModelMap mmap) {
+        Device device = deviceService.selectDeviceByDeviceId(deviceId);
+        mmap.put("device", device);
+        List<SysDictData> sysDictData = dictTypeService.selectDictDataByType("tt_channel_package");
+        Iterator<SysDictData> iterator = sysDictData.iterator();
+        while (iterator.hasNext()){
+            SysDictData iter = iterator.next();
+            if(!ChannelPackage.hasChannel(device.getMechChannel(),iter.getDictValue())){
+                iterator.remove();
+            }
+        }
+        mmap.put("channelPackages", sysDictData);
+        mmap.put("channelPackage",channelPackage);
+        return "tt/config/configFromDevice";
     }
 }
