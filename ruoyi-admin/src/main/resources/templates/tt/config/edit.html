@@ -40,13 +40,19 @@
             <div class="form-group">
                 <label class="col-sm-2 control-label">值：</label>
                 <div class="col-sm-10">
-                    <input name="appConfigValue" th:field="*{appConfigValue}" class="form-control" type="text" maxlength="100">
+                    <input name="appConfigValue" th:field="*{appConfigValue}" class="form-control" type="text" maxlength="100" required>
                 </div>
             </div>
             <div class="form-group">    
                 <label class="col-sm-2 control-label">顺序：</label>
                 <div class="col-sm-4">
                     <input name="appConfigSort" th:field="*{appConfigSort}" class="form-control" type="number" maxlength="3">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">备注：</label>
+                <div class="col-sm-10">
+                    <input name="appConfigMemo" th:field="*{appConfigMemo}" class="form-control" type="text" maxlength="100">
                 </div>
             </div>
         </form>

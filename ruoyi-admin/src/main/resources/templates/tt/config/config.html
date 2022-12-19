@@ -106,11 +106,25 @@
                 },
                 {
                     field: 'appConfigLabel',
-                    title: '标签'
+                    title: '标签',
+                    formatter: function(value, row, index) {
+                        return $.table.tooltip(value, 10, "open");
+                    }
                 },
                 {
                     field: 'appConfigValue',
-                    title: '值'
+                    title: '值',
+                    formatter: function(value, row, index) {
+                        return $.table.tooltip(value, 20, "open");
+                    }
+                },
+                {
+                    field: 'appConfigMemo',
+                    title: '备注',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        return $.table.tooltip(value, 15, "open");
+                    }
                 },
                 {
                     title: '操作',

@@ -21,7 +21,7 @@
                                 </select>
                             </li>
                             <li>
-                                <label>代码：</label>
+                                <label>代码/名称：</label>
                                 <input type="text" name="appConfigCode"/>
                             </li>
                             <li>
@@ -103,6 +103,14 @@
                 {
                     field: 'appConfigValue',
                     title: '值'
+                },
+                {
+                    field: 'appConfigMemo',
+                    title: '备注',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        return $.table.tooltip(value, 10, "open");
+                    }
                 },
                 {
                     title: '操作',

@@ -13,6 +13,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="appConfigCode"    column="app_config_code"    />
         <result property="appConfigValue"    column="app_config_value"    />
         <result property="appConfigLabel"    column="app_config_label"    />
+        <result property="appConfigMemo"    column="app_config_memo"    />
         <result property="appConfigSort"    column="app_config_sort"    />
         <result property="createBy"    column="create_by"    />
         <result property="createTime"    column="create_time"    />
@@ -24,7 +25,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         select
                mech_id,(select mech.mech_name from tt_mechant  mech where mech.mech_id = ac.mech_id) mech_show,
                device_id, (select devi.device_name from tt_device  devi where devi.device_id = ac.device_id) device_show,
-               channel_package, app_config_code, app_config_value, app_config_label, app_config_sort, create_by, create_time, update_by, update_time from tt_app_config ac
+               channel_package, app_config_code, app_config_value, app_config_label,app_config_memo,
+               app_config_sort, create_by, create_time, update_by, update_time from tt_app_config ac
     </sql>
 
     <select id="selectAppConfigList" parameterType="AppConfig" resultMap="AppConfigResult">
@@ -65,6 +67,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="appConfigCode != null">app_config_code,</if>
             <if test="appConfigValue != null">app_config_value,</if>
             <if test="appConfigLabel != null">app_config_label,</if>
+            <if test="appConfigMemo != null">app_config_memo,</if>
             <if test="appConfigSort != null">app_config_sort,</if>
             <if test="createBy != null">create_by,</if>
             <if test="createTime != null">create_time,</if>
@@ -78,6 +81,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="appConfigCode != null">#{appConfigCode},</if>
             <if test="appConfigValue != null">#{appConfigValue},</if>
             <if test="appConfigLabel != null">#{appConfigLabel},</if>
+            <if test="appConfigMemo != null">#{appConfigMemo},</if>
             <if test="appConfigSort != null">#{appConfigSort},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="createTime != null">#{createTime},</if>
@@ -91,6 +95,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <trim prefix="SET" suffixOverrides=",">
             <if test="appConfigValue != null">app_config_value = #{appConfigValue},</if>
             <if test="appConfigLabel != null">app_config_label = #{appConfigLabel},</if>
+            <if test="appConfigMemo != null">app_config_label = #{appConfigMemo},</if>
             <if test="appConfigSort != null">app_config_sort = #{appConfigSort},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>

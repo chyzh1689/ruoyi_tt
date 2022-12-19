@@ -36,6 +36,10 @@ public class AppConfig extends BaseEntity{
     @Excel(name = "标签")
     private String appConfigLabel;
 
+    /** 备注 */
+    @Excel(name = "备注")
+    private String appConfigMemo;
+
     /** 顺序 */
     @Excel(name = "顺序")
     private Long appConfigSort;
