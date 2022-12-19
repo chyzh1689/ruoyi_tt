@@ -166,7 +166,7 @@ public class MechantServiceImpl implements IMechantService {
         SysUser sysUser = ShiroUtils.getSysUser();
         String userType = sysUser.getUserType();
         if (!UserType.SYS.val().equals(userType)) {//商户或者商户下的员工
-            if(UserType.MECH.equals(userType)){
+            if(UserType.MECH.val().equals(userType)){
                 mechant.setParentId(sysUser.getUserId());
             }else{
                 mechant.setMechId(sysUser.getUserId());
@@ -174,12 +174,12 @@ public class MechantServiceImpl implements IMechantService {
         }
         List<Mechant> mechList = mechantMapper.selectMechantList(mechant);
         if(!UserType.SYS.val().equals(userType)){
-            if(UserType.MECH.equals(userType)){
+            if(UserType.MECH.val().equals(userType)){
                 mechList.add(mechantMapper.selectMechantByMechId(sysUser.getUserId()));
             }else{
-                if(mechList.size()>0){
-                    mechList.add(mechantMapper.selectMechantByMechId(mechList.get(0).getParentId()));
-                }
+//                if(mechList.size()>0){
+//                    mechList.add(mechantMapper.selectMechantByMechId(mechList.get(0).getParentId()));
+//                }
             }
         }
         List<Ztree> ztrees = initZtree(mechList);

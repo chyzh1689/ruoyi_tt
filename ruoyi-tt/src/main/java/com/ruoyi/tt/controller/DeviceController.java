@@ -141,6 +141,7 @@ public class DeviceController extends BaseController{
     public String edit(@PathVariable("deviceId") Long deviceId, ModelMap mmap)
     {
         Device device = deviceService.selectDeviceByDeviceId(deviceId);
+        mmap.put("userType",getSysUser().getUserType());
         mmap.put("device", device);
         return prefix + "/edit";
     }

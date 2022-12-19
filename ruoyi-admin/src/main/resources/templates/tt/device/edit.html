@@ -8,7 +8,7 @@
         <form class="form-horizontal m" id="form-device-edit" th:object="${device}">
             <input name="deviceId" th:field="*{deviceId}" type="hidden">
             <input name="mechOwn" type="hidden" id="mechOwn"/>
-            <div class="form-group">    
+            <div class="form-group" th:if="${userType=='00'|| userType=='1'}">
                 <label class="col-sm-2 control-label">所属者：</label>
                 <div class="col-sm-4">
                     <div class="input-group">
@@ -16,6 +16,12 @@
                                placeholder="请选择所属者" class="form-control" th:field="*{mechOwnName}" required>
                         <span class="input-group-addon"><i class="fa fa-search"></i></span>
                     </div>
+                </div>
+            </div>
+            <div class="form-group" th:if="${userType} eq '2'">
+                <label class="col-sm-2 control-label">所属者：</label>
+                <div class="col-sm-4">
+                    <input name ="mechOwnName"  th:field="*{mechOwnName}" class="form-control" type="text" readonly>
                 </div>
             </div>
             <div class="form-group">
