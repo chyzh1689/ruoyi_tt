@@ -33,7 +33,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <include refid="selectAppConfigVo"/>
         <where>  
             <if test="channelPackage != null  and channelPackage != ''"> and channel_package = #{channelPackage}</if>
-            <if test="appConfigCode != null  and appConfigCode != ''"> and( app_config_code = #{appConfigCode} or app_config_label like concat('%', #{appConfigCode}, '%'))</if>
+            <if test="appConfigCode != null  and appConfigCode != ''"> and (app_config_code = #{appConfigCode} or app_config_label like concat('%', #{appConfigCode}, '%'))</if>
             <if test="deviceShow != null  and deviceShow != ''"> and device_id in (select device_id from tt_device where device_no =  #{deviceShow} or device_name like concat('%', #{deviceShow}, '%'))</if>
             <if test="mechId != null "> and mech_id = #{mechId}</if>
             <if test="deviceId != null "> and device_id = #{deviceId}</if>
