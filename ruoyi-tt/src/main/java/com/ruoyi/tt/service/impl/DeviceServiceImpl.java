@@ -107,7 +107,12 @@ public class DeviceServiceImpl implements IDeviceService {
             device.setMechId(mechant.getParentId());
         }
         //根据商户当前渠道配置参数
-        Integer mechChannel = mechant.getMechChannel();
+        this.updateAppConfigForDevice(device, mechant.getMechChannel());
+        return deviceMapper.updateDevice(device);
+    }
+
+    @Override
+    public void updateAppConfigForDevice(Device device, Integer mechChannel) {
         for (String code : ChannelPackage.codeMap().keySet()) {
             if(ChannelPackage.hasChannel(mechChannel,code)){
                 List<AppConfig> appConfigs = appConfigService.selectDefaultAppConfigs(code);
@@ -122,7 +127,6 @@ public class DeviceServiceImpl implements IDeviceService {
                 }
             }
         }
-        return deviceMapper.updateDevice(device);
     }
 
     /**

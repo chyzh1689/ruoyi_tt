@@ -217,13 +217,15 @@ public class DeviceController extends BaseController{
         Device device = deviceService.selectDeviceByDeviceId(deviceId);
         mmap.put("device", device);
         List<SysDictData> sysDictData = dictTypeService.selectDictDataByType("tt_channel_package");
+        Integer mechChannel = device.getMechChannel();
         Iterator<SysDictData> iterator = sysDictData.iterator();
         while (iterator.hasNext()){
             SysDictData iter = iterator.next();
-            if(!ChannelPackage.hasChannel(device.getMechChannel(),iter.getDictValue())){
+            if(!ChannelPackage.hasChannel(mechChannel,iter.getDictValue())){
                 iterator.remove();
             }
         }
+        deviceService.updateAppConfigForDevice(device,mechChannel);
         mmap.put("channelPackages", sysDictData);
         mmap.put("channelPackage",channelPackage);
         return "tt/config/configFromDevice";

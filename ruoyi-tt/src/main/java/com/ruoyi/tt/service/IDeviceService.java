@@ -43,6 +43,8 @@ public interface IDeviceService
      */
     public int updateDevice(Device device);
 
+    void updateAppConfigForDevice(Device device, Integer mechChannel);
+
     /**
      * 批量删除设备信息
      * 
