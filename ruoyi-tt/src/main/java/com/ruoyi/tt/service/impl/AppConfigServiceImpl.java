@@ -2,6 +2,7 @@ package com.ruoyi.tt.service.impl;
 
 import java.util.List;
 import com.ruoyi.common.utils.DateUtils;
+import com.ruoyi.tt.TTContants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.tt.mapper.AppConfigMapper;
@@ -36,6 +37,25 @@ public class AppConfigServiceImpl implements IAppConfigService
     @Override
     public AppConfig selectAppConfig(Long deviceId, String channelPackage, String appConfigCode) {
         return appConfigMapper.selectAppConfig(deviceId,channelPackage,appConfigCode);
+    }
+    @Override
+    public List<AppConfig> selectDefaultAppConfigs(String channelPackage) {
+        return selectAppConfigs(channelPackage, TTContants.VAL_PARENT_ID,TTContants.VAL_PARENT_ID);
+    }
+
+    @Override
+    public List<AppConfig> selectDefaultAppConfigs(String channelPackage, Long mechId) {
+        return selectAppConfigs(channelPackage, TTContants.VAL_PARENT_ID,mechId);
+    }
+
+    @Override
+    public List<AppConfig> selectAppConfigs(String channelPackage, Long deviceId) {
+        return appConfigMapper.selectAppConfigsByDeviceId(channelPackage,deviceId);
+    }
+
+    @Override
+    public List<AppConfig> selectAppConfigs(String channelPackage, Long deviceId, Long mechId) {
+        return appConfigMapper.selectAppConfigs(channelPackage,deviceId,mechId);
     }
 
     /**
@@ -99,4 +119,6 @@ public class AppConfigServiceImpl implements IAppConfigService
     {
         return appConfigMapper.deleteAppConfigByDeviceId(deviceId);
     }
+
+
 }

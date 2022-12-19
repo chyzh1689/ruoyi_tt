@@ -36,7 +36,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="deviceId != null "> and device_id = #{deviceId}</if>
 
         </where>
-        order by app_config_sort asc
+        order by mech_id asc,device_id asc,channel_package asc,app_config_sort asc
     </select>
     
     <select id="selectAppConfigByDeviceId" parameterType="Long" resultMap="AppConfigResult">
@@ -46,6 +46,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectAppConfig" resultMap="AppConfigResult">
         <include refid="selectAppConfigVo"/>
         where device_id = #{deviceId} and channel_package = #{channelPackage} and app_config_code = #{appConfigCode}
+    </select>
+    <select id="selectAppConfigsByDeviceId" resultMap="AppConfigResult">
+        <include refid="selectAppConfigVo"/>
+        where device_id = #{deviceId} and channel_package = #{channelPackage}
+    </select>
+    <select id="selectAppConfigs" resultMap="AppConfigResult">
+        <include refid="selectAppConfigVo"/>
+        where device_id = #{deviceId} and channel_package = #{channelPackage} and mech_id = #{mechId}
     </select>
 
     <insert id="insertAppConfig" parameterType="AppConfig">

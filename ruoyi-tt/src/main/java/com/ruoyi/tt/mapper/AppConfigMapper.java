@@ -70,5 +70,10 @@ public interface AppConfigMapper
                                @Param("appConfigCode")String appConfigCode);
 
 
+    List<AppConfig> selectAppConfigsByDeviceId(@Param("channelPackage")String channelPackage,
+                                               @Param("deviceId")Long deviceId);
 
+    List<AppConfig> selectAppConfigs(@Param("channelPackage")String channelPackage,
+                                     @Param("deviceId")Long deviceId,
+                                     @Param("mechId")Long mechId);
 }

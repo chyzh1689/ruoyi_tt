@@ -67,4 +67,17 @@ public interface IAppConfigService
      */
     public int deleteAppConfigByDeviceId(Long deviceId);
 
+    /**
+     * 获取默认的应用配置参数配置
+     * @return
+     */
+    List<AppConfig> selectDefaultAppConfigs(String channelPackage);
+
+    List<AppConfig> selectDefaultAppConfigs(String channelPackage,Long mechId);
+
+    List<AppConfig> selectAppConfigs(String channelPackage,Long deviceId);
+
+    List<AppConfig> selectAppConfigs(String channelPackage,Long deviceId,Long mechId);
+
+
 }

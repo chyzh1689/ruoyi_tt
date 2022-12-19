@@ -1,12 +1,17 @@
 package com.ruoyi.tt.service.impl;
 
 import java.util.List;
+import java.util.Map;
+
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.tt.TTContants;
+import com.ruoyi.tt.domain.AppConfig;
 import com.ruoyi.tt.domain.Mechant;
+import com.ruoyi.tt.enums.ChannelPackage;
 import com.ruoyi.tt.enums.MechType;
 import com.ruoyi.tt.mapper.MechantMapper;
+import com.ruoyi.tt.service.IAppConfigService;
 import com.ruoyi.tt.third.Match;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +57,9 @@ public class DeviceServiceImpl implements IDeviceService {
         return deviceMapper.selectDeviceList(device);
     }
 
+
+    @Autowired
+    private IAppConfigService appConfigService;
     /**
      * 新增设备信息
      * 
@@ -61,16 +69,26 @@ public class DeviceServiceImpl implements IDeviceService {
     @Override
     public int insertDevice(Device device)    {
         device.setCreateTime(DateUtils.getNowDate());
-        if(device.getMechOwn()!=null){
-            Mechant mechant = mechantMapper.selectMechantByMechId(device.getMechOwn());
-            if(MechType.MECH.val().equals(mechant.getMechType())){
-                device.setMechId(device.getMechOwn());
-            }else{
-                device.setMechId(mechant.getParentId());
+        Mechant mechant = mechantMapper.selectMechantByMechId(device.getMechOwn());
+        if(MechType.MECH.val().equals(mechant.getMechType())){
+            device.setMechId(device.getMechOwn());
+        }else{
+            device.setMechId(mechant.getParentId());
+        }
+        int cnt = deviceMapper.insertDevice(device);
+        //根据商户当前渠道配置参数
+        Integer mechChannel = mechant.getMechChannel();
+        for (String code : ChannelPackage.codeMap().keySet()) {
+            if(ChannelPackage.hasChannel(mechChannel,code)){
+                List<AppConfig> appConfigs = appConfigService.selectDefaultAppConfigs(code);
+                for (AppConfig appConfig : appConfigs) {
+                    appConfig.setDeviceId(device.getDeviceId());
+                    appConfig.setMechId(device.getMechId());
+                    appConfigService.insertAppConfig(appConfig);
+                }
             }
         }
-
-        return deviceMapper.insertDevice(device);
+        return cnt;
     }
 
     /**
@@ -80,9 +98,30 @@ public class DeviceServiceImpl implements IDeviceService {
      * @return 结果
      */
     @Override
-    public int updateDevice(Device device)
-    {
+    public int updateDevice(Device device)  {
         device.setUpdateTime(DateUtils.getNowDate());
+        Mechant mechant = mechantMapper.selectMechantByMechId(device.getMechOwn());
+        if(MechType.MECH.val().equals(mechant.getMechType())){
+            device.setMechId(device.getMechOwn());
+        }else{
+            device.setMechId(mechant.getParentId());
+        }
+        //根据商户当前渠道配置参数
+        Integer mechChannel = mechant.getMechChannel();
+        for (String code : ChannelPackage.codeMap().keySet()) {
+            if(ChannelPackage.hasChannel(mechChannel,code)){
+                List<AppConfig> appConfigs = appConfigService.selectDefaultAppConfigs(code);
+                for (AppConfig appConfig : appConfigs) {
+                    AppConfig dataAppConfig = appConfigService.selectAppConfig(device.getDeviceId(),
+                            code, appConfig.getAppConfigCode());
+                    if(dataAppConfig==null){
+                        appConfig.setDeviceId(device.getDeviceId());
+                        appConfig.setMechId(device.getMechId());
+                        appConfigService.insertAppConfig(appConfig);
+                    }
+                }
+            }
+        }
         return deviceMapper.updateDevice(device);
     }
 
