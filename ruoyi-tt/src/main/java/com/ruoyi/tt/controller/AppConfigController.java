@@ -5,6 +5,8 @@ import java.util.List;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.enums.UserType;
 import com.ruoyi.tt.TTContants;
+import com.ruoyi.tt.domain.Mechant;
+import com.ruoyi.tt.service.IMechantService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,6 +39,8 @@ public class AppConfigController extends BaseController
 
     @Autowired
     private IAppConfigService appConfigService;
+    @Autowired
+    private IMechantService mechantService;
 
     @RequiresPermissions("tt:config:view")
     @GetMapping()
@@ -56,7 +60,8 @@ public class AppConfigController extends BaseController
         if(sysUser!=null && !UserType.SYS.val().equals(sysUser.getUserType())){
             appConfig.setMechId(sysUser.getUserId());
             if(UserType.EMPL.val().equals(sysUser.getUserType())){
-                //appConfig.setMechOwn(sysUser.getUserId());
+                Mechant mechant = mechantService.selectMechantByMechId(sysUser.getUserId());
+                appConfig.setMechId(mechant.getParentId());
             }
         }
         startPage();
@@ -71,8 +76,7 @@ public class AppConfigController extends BaseController
     @Log(title = "应用参数配置", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(AppConfig appConfig)
-    {
+    public AjaxResult export(AppConfig appConfig)    {
         List<AppConfig> list = appConfigService.selectAppConfigList(appConfig);
         ExcelUtil<AppConfig> util = new ExcelUtil<AppConfig>(AppConfig.class);
         return util.exportExcel(list, "应用参数配置数据");
