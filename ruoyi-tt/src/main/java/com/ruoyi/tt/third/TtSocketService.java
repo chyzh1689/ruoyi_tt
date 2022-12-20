@@ -6,7 +6,6 @@ import com.ruoyi.common.constant.RedisConstants;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.tt.TTContants;
 import com.ruoyi.tt.domain.*;
 import com.ruoyi.tt.enums.AccountStatus;
@@ -365,17 +364,8 @@ public class TtSocketService {
     }
 
     private JSONObject getDefaultAppConfig(Account account, Device device) {
-        List<AppConfig> defaultAppConfigs = appConfigService.
-                selectDefaultAppConfigs(account.getAccountChannel());
-        JSONObject jo = IAppConfigService.appConfigToJO(appConfigService.selectAppConfigs(
+        return IAppConfigService.appConfigToJO(appConfigService.selectAppConfigs(
                 account.getAccountChannel(), device.getDeviceId()));
-        for (AppConfig appConfig : defaultAppConfigs) {
-            Object o = jo.get(appConfig.getAppConfigCode());
-            if(o==null){
-                jo.put(appConfig.getAppConfigCode(),appConfig.getAppConfigValue());
-            }
-        }
-        return jo;
     }
 
     /**
@@ -502,6 +492,13 @@ public class TtSocketService {
             account.setAccountName(userInfo.getUserName());
             account.setAccountImgUrl(userInfo.getImageUrl());
             account.setAccountStatus(AccountStatus.LOGIN.val());
+            account.setFollowNumber(0);
+            AppConfig appConfig = appConfigService.selectAppConfig(device.getDeviceId(), account.getAccountChannel(),
+                    TTContants.APP_CONFIG_DY_FOLLOW_NUMBER);
+            if(appConfig!=null){
+                account.setFollowNumber(Integer.parseInt(appConfig.getAppConfigValue()));
+            }
+
             accountMapper.insertAccount(account);
         }else{
             dataAccount.setDeviceId(device.getDeviceId());

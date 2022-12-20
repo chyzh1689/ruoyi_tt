@@ -148,8 +148,8 @@ public class DeviceServiceImpl implements IDeviceService {
      * @return 结果
      */
     @Override
-    public int deleteDeviceByDeviceId(Long deviceId)
-    {
+    public int deleteDeviceByDeviceId(Long deviceId)    {
+        appConfigService.deleteAppConfigByDeviceId(deviceId);
         return deviceMapper.deleteDeviceByDeviceId(deviceId);
     }
 }
