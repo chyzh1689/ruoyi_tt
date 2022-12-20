@@ -8,10 +8,7 @@ import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.tt.TTContants;
-import com.ruoyi.tt.domain.Account;
-import com.ruoyi.tt.domain.Device;
-import com.ruoyi.tt.domain.Mechant;
-import com.ruoyi.tt.domain.Notice;
+import com.ruoyi.tt.domain.*;
 import com.ruoyi.tt.enums.AccountStatus;
 import com.ruoyi.tt.enums.ChannelPackage;
 import com.ruoyi.tt.enums.NoticeFlag;
@@ -20,6 +17,7 @@ import com.ruoyi.tt.mapper.AccountMapper;
 import com.ruoyi.tt.mapper.DeviceMapper;
 import com.ruoyi.tt.mapper.MechantMapper;
 import com.ruoyi.tt.mapper.NoticeMapper;
+import com.ruoyi.tt.service.IAppConfigService;
 import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -321,7 +319,7 @@ public class TtSocketService {
     }
 
     @Autowired
-    private ISysConfigService configService;
+    private IAppConfigService appConfigService;
     /**
      * 配置信息
      * @param ttSocketDto
@@ -352,7 +350,64 @@ public class TtSocketService {
         return ttSocketDto.ok(obj,"获取配置信息成功！");
     }
 
+    /**
+     * 获取不同渠道的配置参数
+     * @param account
+     * @param device
+     * @return
+     */
     public JSONObject getAppConfig(Account account,Device device) {
+        switch (ChannelPackage.valueOf(account.getAccountChannel())){
+            case DY:  return this.getDyAppConfig(account,device);
+            case XHS: return this.getXhsAppConfig(account,device);
+            default:  return this.getDefaultAppConfig(account,device);
+        }
+    }
+
+    private JSONObject getDefaultAppConfig(Account account, Device device) {
+        List<AppConfig> defaultAppConfigs = appConfigService.
+                selectDefaultAppConfigs(account.getAccountChannel());
+        JSONObject jo = IAppConfigService.appConfigToJO(appConfigService.selectAppConfigs(
+                account.getAccountChannel(), device.getDeviceId()));
+        for (AppConfig appConfig : defaultAppConfigs) {
+            Object o = jo.get(appConfig.getAppConfigCode());
+            if(o==null){
+                jo.put(appConfig.getAppConfigCode(),appConfig.getAppConfigValue());
+            }
+        }
+        return jo;
+    }
+
+    /**
+     * 获取小红书的配置参数
+     * @param account
+     * @param device
+     * @return
+     */
+    private JSONObject getXhsAppConfig(Account account, Device device) {
+        Map<String,String> deviceConfigMap = IAppConfigService.appConfigToMap(appConfigService.selectAppConfigs(
+                account.getAccountChannel(), device.getDeviceId()));
+        Map<String,String> defaultConfigMap = IAppConfigService.appConfigToMap(appConfigService.
+                selectDefaultAppConfigs(account.getAccountChannel()));
+        JSONObject obj = new JSONObject();
+        Chat chat = new Chat();
+        chat.setContents(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_XHS_CHAT_CONTENTS));
+        chat.setSendCount(Integer.valueOf(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_XHS_CHAT_SENDCOUNT)));
+        chat.setSleepTime(Long.valueOf(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_XHS_CHAT_SLEEPTIME)));
+        obj.put("chat",chat);
+        return obj;
+    }
+
+    /**
+     * 获取抖音的配置参数
+     * @param account
+     * @param device
+     * @return
+     */
+    private JSONObject getDyAppConfig(Account account, Device device) {
         Follow follow = new Follow();
         Integer remainNum = account.getFollowNumber();
         String dateStr = DateUtils.dateTime();
@@ -369,18 +424,33 @@ public class TtSocketService {
         }
         //设置每日关注数量
         follow.setNumber(remainNum);
-        follow.setSex(device.getFollowSex());
-        follow.setMinAge(device.getFollowMinAge());
-        follow.setMaxAge(device.getFollowMaxAge());
-        follow.setMinSpeed(1000L * device.getFollowMinSpeed());
-        follow.setMaxSpeed(1000L * device.getFollowMaxSpeed());
-        follow.setSleepTime(1000L * device.getFollowSleepTime());
-        follow.setSleepCount(device.getFollowSleepCount());
+        Map<String,String> deviceConfigMap = IAppConfigService.appConfigToMap(appConfigService.selectAppConfigs(
+                account.getAccountChannel(), device.getDeviceId()));
+        Map<String,String> defaultConfigMap = IAppConfigService.appConfigToMap( appConfigService.
+                selectDefaultAppConfigs(account.getAccountChannel()));
+
+        follow.setSex(Integer.valueOf(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_DY_FOLLOW_SEX)));
+        follow.setMinAge(Integer.valueOf(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_DY_FOLLOW_MINAGE)));
+        follow.setMaxAge(Integer.valueOf(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_DY_FOLLOW_MAXAGE)));
+        follow.setMinSpeed(Long.valueOf(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_DY_FOLLOW_MINSPEED)));
+        follow.setMaxSpeed(Long.valueOf(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_DY_FOLLOW_MAXSPEED)));
+        follow.setSleepTime(Long.valueOf(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_DY_FOLLOW_SLEEPTIME)));
+        follow.setSleepCount(Integer.valueOf(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_DY_FOLLOW_SLEEPCOUNT)));
         Match match = new Match();
         follow.setMatch(match);
-        match.setNickname(device.getFollowMatchNickname());
-        match.setSignature(device.getFollowMatchSignature());
-        match.setComment(device.getFollowMatchComment());
+        match.setNickname(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_DY_FOLLOW_MATCH_NICKNAME));
+        match.setSignature(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_DY_FOLLOW_MATCH_SIGNATURE));
+        match.setComment(IAppConfigService.getValue(deviceConfigMap,defaultConfigMap,
+                TTContants.APP_CONFIG_DY_FOLLOW_MATCH_COMMENT));
         JSONObject obj = new JSONObject();
         obj.put("follow",follow);
         return obj;
@@ -432,7 +502,6 @@ public class TtSocketService {
             account.setAccountName(userInfo.getUserName());
             account.setAccountImgUrl(userInfo.getImageUrl());
             account.setAccountStatus(AccountStatus.LOGIN.val());
-            account.setFollowNumber(device.getFollowNumber());
             accountMapper.insertAccount(account);
         }else{
             dataAccount.setDeviceId(device.getDeviceId());

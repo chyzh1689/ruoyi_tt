@@ -1,6 +1,11 @@
 package com.ruoyi.tt.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import com.alibaba.fastjson.JSONObject;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.tt.domain.AppConfig;
 
 /**
@@ -79,5 +84,30 @@ public interface IAppConfigService
 
     List<AppConfig> selectAppConfigs(String channelPackage,Long deviceId,Long mechId);
 
+    static Map<String,String> appConfigToMap(AppConfig appConfig){
+        Map<String,String> result = new HashMap<>();
+        result.put(appConfig.getAppConfigCode(),appConfig.getAppConfigValue());
+        return result;
+    }
 
+    static Map<String,String> appConfigToMap(List<AppConfig> appConfigs){
+        Map<String,String> result = new HashMap<>();
+        for (AppConfig appConfig : appConfigs) {
+            result.put(appConfig.getAppConfigCode(),appConfig.getAppConfigValue());
+        }
+        return result;
+    }
+
+    static JSONObject appConfigToJO(List<AppConfig> appConfigs){
+        JSONObject jo = new JSONObject();
+        for (AppConfig appConfig : appConfigs) {
+            jo.put(appConfig.getAppConfigCode(),appConfig.getAppConfigValue());
+        }
+        return jo;
+    }
+
+    static String getValue(Map<String,String> deviceConfigMap,Map<String,String> defaultConfigMap,String key){
+        String value = deviceConfigMap.get(key);
+        return StringUtils.isEmpty(value)?defaultConfigMap.get(key):value;
+    }
 }
