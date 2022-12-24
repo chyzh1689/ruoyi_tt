@@ -356,16 +356,44 @@ public class TtSocketService {
      * @return
      */
     public JSONObject getAppConfig(Account account,Device device) {
-        switch (ChannelPackage.valueOf(account.getAccountChannel())){
-            case DY:  return this.getDyAppConfig(account,device);
-            case XHS: return this.getXhsAppConfig(account,device);
-            default:  return this.getDefaultAppConfig(account,device);
+        JSONObject jo =  this.getDefaultAppConfig(account,device);
+//        switch (ChannelPackage.valueOf(account.getAccountChannel())){
+//            case DY:  return this.getDyAppConfig(account,device);
+//            case XHS: return this.getXhsAppConfig(account,device);
+//            default:  return this.getDefaultAppConfig(account,device);
+//        }
+        //单独设置 每日关注数量
+        Integer remainNum = account.getFollowNumber();
+        String dateStr = DateUtils.dateTime();
+        String key = account.getAccountNo()+"@"+ account.getMechantId()+"@"+ account.getAccountChannel();
+        //当天正在关注数量
+        Integer applyNum = redisCache.getCacheMapValue(dateStr + TTContants.cache_key_tt_day_apply_number,key);
+        if(applyNum!=null){
+            remainNum-=applyNum;
         }
+        //当天关注成功数量
+        Integer followNum = redisCache.getCacheMapValue(dateStr + TTContants.cache_key_tt_day_follow_number,key);
+        if(followNum!=null){
+            remainNum-=followNum;
+        }
+        //设置每日关注数量
+        jo.put(TTContants.APP_CONFIG_DY_FOLLOW_NUMBER, remainNum);
+        return jo;
     }
 
     private JSONObject getDefaultAppConfig(Account account, Device device) {
-        return IAppConfigService.appConfigToJO(appConfigService.selectAppConfigs(
+        Map<String,String> deviceConfigMap = IAppConfigService.appConfigToMap(appConfigService.selectAppConfigs(
                 account.getAccountChannel(), device.getDeviceId()));
+        JSONObject jo = new JSONObject();
+        List<AppConfig> defaultAppConfigs = appConfigService.selectDefaultAppConfigs(account.getAccountChannel());
+        for (AppConfig appConfig : defaultAppConfigs) {
+            String value = deviceConfigMap.get(appConfig.getAppConfigCode());
+            if(StringUtils.isEmpty(value)){
+                value = appConfig.getAppConfigValue();
+            }
+            jo.put(appConfig.getAppConfigCode(),value);
+        }
+        return jo;
     }
 
     /**
