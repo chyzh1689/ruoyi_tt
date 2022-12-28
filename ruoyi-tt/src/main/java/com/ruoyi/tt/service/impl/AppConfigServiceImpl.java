@@ -103,9 +103,13 @@ public class AppConfigServiceImpl implements IAppConfigService
      * @return 结果
      */
     @Override
-    public int deleteAppConfigByDeviceIds(String deviceIds)
-    {
-        return appConfigMapper.deleteAppConfigByDeviceIds(Convert.toLongArray(deviceIds));
+    public int deleteAppConfigByDeviceIds(String deviceIds)    {
+        String[] datas = deviceIds.split(",");
+        int len = datas.length;
+        for (int i = 0; i < len / 3; i++) {
+            appConfigMapper.deleteAppConfig(Long.valueOf(datas[i*3]),datas[i*3+1],datas[i*3+2]);
+        }
+        return 1;
     }
 
     /**
